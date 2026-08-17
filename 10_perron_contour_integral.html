@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Perron's Formula Contour Integration</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 1.5rem; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header { margin-bottom: 1.25rem; border-bottom: 1px solid #334155; padding-bottom: 0.85rem; }
+        h1 { color: #38bdf8; margin: 0 0 0.4rem 0; font-size: 1.5rem; }
+        .subtitle { color: #94a3b8; margin: 0; font-size: 0.9rem; line-height: 1.4; }
+
+        .controls-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: center; }
+        .control-group { display: flex; flex-direction: column; gap: 0.3rem; }
+        label { font-size: 0.8rem; font-weight: 600; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .val-badge { color: #38bdf8; font-family: monospace; font-size: 0.85rem; }
+
+        input[type=range], select { -webkit-appearance: none; width: 100%; background: #334155; height: 8px; border-radius: 4px; outline: none; touch-action: manipulation; }
+        select { height: 34px; color: #f8fafc; padding: 0 0.5rem; border: 1px solid #475569; font-size: 0.85rem; border-radius: 6px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer; border: 2px solid #0f172a; }
+
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+        .canvas-wrapper { width: 100%; height: 400px; position: relative; }
+        canvas { width: 100% !important; height: 100% !important; background: #0f172a; border-radius: 8px; border: 1px solid #334155; display: block; }
+
+        .theory-section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; }
+        .theory-section h2 { font-size: 1.1rem; color: #38bdf8; margin: 0 0 0.75rem 0; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+        .theory-section p { font-size: 0.9rem; line-height: 1.6; color: #cbd5e1; margin: 0 0 1rem 0; }
+        .theory-section p:last-child { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Perron's Formula Contour Integration</h1>
+            <p class="subtitle">Inverse Mellin transform contour wrapping non-trivial zeros ρ of the Riemann zeta function</p>
+        </div>
+
+        <div class="controls-card">
+            
+            <div class="control-group">
+                <label><span>Contour Height (T)</span><span id="tVal" class="val-badge">40</span></label>
+                <input type="range" id="contourT" min="15" max="80" value="40" step="5">
+            </div>
+            <div class="control-group">
+                <label><span>Sigma Offset (c)</span><span id="cVal" class="val-badge">1.50</span></label>
+                <input type="range" id="sigmaC" min="1.1" max="2.0" value="1.5" step="0.05">
+            </div>
+        
+        </div>
+
+        <div class="card">
+            <div class="canvas-wrapper"><canvas id="mainCanvas"></canvas></div>
+        </div>
+
+        <div class="theory-section">
+            <h2>Theoretical Foundation & Mathematical Dynamics</h2>
+            <p>Perron's Formula expresses the step-vector prime counting function $\psi(x) = \sum_{n \le x} \Lambda(n)$ as an inverse Mellin transform contour integral over the complex plane: $\psi_0(x) = \frac{1}{2\pi i} \int_{c - i\infty}^{c + i\infty} -\frac{\zeta'(s)}{\zeta(s)} \frac{x^s}{s} ds$.</p>
+<p>By shifting the vertical line of integration $\text{Re}(s) = c > 1$ to the left across the critical strip $0 < \text{Re}(s) < 1$, Cauchy's Residue Theorem captures poles at $s = 1$ (main term $x$) and at non-trivial zeros $s = \rho$ (oscillatory terms $-x^\rho / \rho$), yielding the explicit formula $\psi(x) = x - \sum_\rho \frac{x^\rho}{\rho} - \ln(2\pi)$.</p>
+<p>This interactive diagram renders the complex $s$-plane, displaying the vertical integration path $c \pm iT$, the main pole at $s=1$, trivial zeros along the negative real axis, and non-trivial zeros aligned on the critical line $\text{Re}(s) = 1/2$.</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            return { w: rect.width, h: rect.height };
+        }
+
+        window.addEventListener('resize', draw);
+        
+            function draw() {
+                const T = parseFloat(document.getElementById('contourT').value);
+                const c = parseFloat(document.getElementById('sigmaC').value);
+                document.getElementById('tVal').textContent = T.toFixed(0);
+                document.getElementById('cVal').textContent = c.toFixed(2);
+
+                const { w, h } = resize();
+                ctx.clearRect(0, 0, w, h);
+
+                const cx = w * 0.4, cy = h / 2;
+                const scaleX = 80, scaleY = 3;
+
+                ctx.strokeStyle = '#475569'; ctx.beginPath();
+                ctx.moveTo(20, cy); ctx.lineTo(w - 20, cy);
+                ctx.moveTo(cx, 20); ctx.lineTo(cx, h - 20);
+                ctx.stroke();
+
+                const critX = cx + 0.5 * scaleX;
+                ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+                ctx.beginPath(); ctx.moveTo(critX, 20); ctx.lineTo(critX, h - 20); ctx.stroke();
+                ctx.setLineDash([]);
+
+                const contourX = cx + c * scaleX;
+                const topY = cy - T * scaleY, botY = cy + T * scaleY;
+                ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2; ctx.beginPath();
+                ctx.moveTo(contourX, botY); ctx.lineTo(contourX, topY); ctx.stroke();
+
+                const zeros = [14.13, 21.02, 25.01, 30.42, 32.93, 37.58, 40.91, 43.32];
+                ctx.fillStyle = '#34d399';
+                zeros.forEach(z => {
+                    if (z <= T) {
+                        ctx.beginPath(); ctx.arc(critX, cy - z * scaleY, 4, 0, 2 * Math.PI); ctx.fill();
+                        ctx.beginPath(); ctx.arc(critX, cy + z * scaleY, 4, 0, 2 * Math.PI); ctx.fill();
+                    }
+                });
+
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath(); ctx.arc(cx + 1.0 * scaleX, cy, 6, 0, 2 * Math.PI); ctx.fill();
+            }
+            ['contourT', 'sigmaC'].forEach(id => document.getElementById(id).addEventListener('input', draw));
+            draw();
+        
+    </script>
+</body>
+</html>

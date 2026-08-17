@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>p-adic Ultrametric Tree & Radial Geometry</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 1.5rem; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header { margin-bottom: 1.25rem; border-bottom: 1px solid #334155; padding-bottom: 0.85rem; }
+        h1 { color: #38bdf8; margin: 0 0 0.4rem 0; font-size: 1.5rem; }
+        .subtitle { color: #94a3b8; margin: 0; font-size: 0.9rem; line-height: 1.4; }
+
+        .controls-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: center; }
+        .control-group { display: flex; flex-direction: column; gap: 0.3rem; }
+        label { font-size: 0.8rem; font-weight: 600; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .val-badge { color: #38bdf8; font-family: monospace; font-size: 0.85rem; }
+
+        input[type=range], select { -webkit-appearance: none; width: 100%; background: #334155; height: 8px; border-radius: 4px; outline: none; touch-action: manipulation; }
+        select { height: 34px; color: #f8fafc; padding: 0 0.5rem; border: 1px solid #475569; font-size: 0.85rem; border-radius: 6px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer; border: 2px solid #0f172a; }
+
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+        .canvas-wrapper { width: 100%; height: 400px; position: relative; }
+        canvas { width: 100% !important; height: 100% !important; background: #0f172a; border-radius: 8px; border: 1px solid #334155; display: block; }
+
+        .theory-section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; }
+        .theory-section h2 { font-size: 1.1rem; color: #38bdf8; margin: 0 0 0.75rem 0; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+        .theory-section p { font-size: 0.9rem; line-height: 1.6; color: #cbd5e1; margin: 0 0 1rem 0; }
+        .theory-section p:last-child { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>p-adic Ultrametric Tree & Radial Geometry</h1>
+            <p class="subtitle">Hierarchical clustering of integers under the p-adic norm |x - y|_p = p^-v_p(x-y)</p>
+        </div>
+
+        <div class="controls-card">
+            
+            <div class="control-group">
+                <label><span>Prime Base (p)</span></label>
+                <select id="padicBase">
+                    <option value="2">p = 2 (Binary Tree)</option>
+                    <option value="3">p = 3 (Ternary Tree)</option>
+                    <option value="5">p = 5 (Quinary Tree)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label><span>Tree Depth Level (k)</span><span id="kVal" class="val-badge">4</span></label>
+                <input type="range" id="treeDepth" min="2" max="5" value="4" step="1">
+            </div>
+        
+        </div>
+
+        <div class="card">
+            <div class="canvas-wrapper"><canvas id="mainCanvas"></canvas></div>
+        </div>
+
+        <div class="theory-section">
+            <h2>Theoretical Foundation & Mathematical Dynamics</h2>
+            <p>The $p$-adic numbers $\mathbb{Q}_p$ redefine arithmetic distance using the $p$-adic norm $|x|_p = p^{-v_p(x)}$, where $v_p(x)$ is the highest power of $p$ dividing $x$. Under this valuation, two integers are topologically close if their difference is divisible by a high power of $p$, yielding a non-Archimedean ultrametric space.</p>
+<p>Ultrametric spaces satisfy the strong triangle inequality $|x - z|_p \le \max(|x - y|_p, |y - z|_p)$, forcing every triangle to be isosceles with a short base. This property organizes integers into a fractal hierarchy of disjoint, compact valuation balls $\mathbb{Z}_p$, where every point inside a ball functions as its center.</p>
+<p>This visualization renders the radial branching of $\mathbb{Z}_p$ rings up to depth $k$. In the Trinary Framework, composite spokes map directly to closed sub-balls within $\mathbb{Z}_3$ and $\mathbb{Z}_5$, leaving coprime channels as open boundary paths across the $p$-adic boundary.</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            return { w: rect.width, h: rect.height };
+        }
+
+        window.addEventListener('resize', draw);
+        
+            function draw() {
+                const p = parseInt(document.getElementById('padicBase').value);
+                const maxDepth = parseInt(document.getElementById('treeDepth').value);
+                document.getElementById('kVal').textContent = maxDepth;
+
+                const { w, h } = resize();
+                ctx.clearRect(0, 0, w, h);
+
+                const cx = w / 2, cy = h / 2;
+
+                function drawBranch(x, y, radius, angle, depth) {
+                    if (depth > maxDepth) return;
+
+                    ctx.fillStyle = depth === maxDepth ? '#38bdf8' : '#475569';
+                    ctx.beginPath(); ctx.arc(x, y, Math.max(6 - depth, 2), 0, 2 * Math.PI); ctx.fill();
+
+                    const numChildren = p;
+                    const spread = (2 * Math.PI) / Math.pow(p, depth);
+
+                    for (let i = 0; i < numChildren; i++) {
+                        const childAngle = angle + (i - (numChildren - 1) / 2) * spread;
+                        const childRadius = radius * 0.65;
+                        const nx = x + Math.cos(childAngle) * childRadius;
+                        const ny = y + Math.sin(childAngle) * childRadius;
+
+                        ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(nx, ny); ctx.stroke();
+
+                        drawBranch(nx, ny, childRadius, childAngle, depth + 1);
+                    }
+                }
+                drawBranch(cx, cy, Math.min(w, h) * 0.38, 0, 1);
+            }
+            ['padicBase', 'treeDepth'].forEach(id => document.getElementById(id).addEventListener('input', draw));
+            draw();
+        
+    </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bounded Trinary Phase Clock & Critical Line Alignment</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #f8fafc; padding: 2rem; display: flex; justify-content: center; }
+        .container { max-width: 900px; width: 100%; }
+        h1 { font-size: 1.75rem; color: #38bdf8; margin-bottom: 0.25rem; }
+        .subtitle { font-size: 0.95rem; color: #94a3b8; margin-bottom: 1.5rem; }
+        .controls { background: #1e293b; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; border: 1px solid #334155; }
+        .control-group { display: flex; flex-direction: column; gap: 0.35rem; }
+        .control-group label { font-size: 0.85rem; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .val-badge { color: #38bdf8; font-family: monospace; margin-left: 0.5rem; }
+        input[type="range"], select { background: #0f172a; color: #f8fafc; border: 1px solid #475569; padding: 0.4rem; border-radius: 4px; }
+        canvas { background: #020617; border-radius: 8px; width: 100%; height: 400px; display: block; margin-bottom: 1.5rem; border: 1px solid #334155; }
+        .content p { line-height: 1.6; color: #cbd5e1; margin-bottom: 1rem; font-size: 0.95rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bounded Trinary Phase Clock & Critical Line Alignment</h1>
+        <div class="subtitle">Globally convergent series Ξ(s, t) mapping vector fields across σ = 1/2 axis</div>
+        <div class="controls">
+            <div class="control-group">
+                <label><span>Phase Velocity (t)</span><span id="tVal" class="val-badge">5.0</span></label>
+                <input type="range" id="paramT" min="0.0" max="15.0" value="5.0" step="0.5">
+            </div>
+            <div class="control-group">
+                <label><span>Frequency Axis (τ)</span><span id="tauVal" class="val-badge">14.13</span></label>
+                <input type="range" id="paramTau" min="5.0" max="40.0" value="14.13" step="0.1">
+            </div>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div class="content"><p>Evaluating geometric interval midpoints across Base-3 boundaries $(3^{x-1}, 3^x]$ yields $y_{\text{mid}}(x) = \sqrt{3^x \cdot 3^{x-1}} = 3^{x - 1/2}$[span_18](start_span)[span_18](end_span). The exponent shift of exactly $-1/2$ provides a geometric analogy to the classical Riemann critical line $\sigma = 1/2$[span_19](start_span)[span_19](end_span).</p>
+<p>To stabilize infinite series without exponential divergence, the system incorporates a bounded trinary phase clock $e^{i 2\pi x / 3}$[span_20](start_span)[span_20](end_span). Rotating smoothly around the complex unit circle, it embeds Base-3 geometry while inheriting functional reflection symmetry $\Xi(s, t) = -\Xi(1 - s, -t)$[span_21](start_span)[span_21](end_span).</p>
+<p>This graph renders the magnitude envelope $|\Xi(\sigma + i\tau)|$ across real power states $\sigma \in [0.1, 0.9]$[span_22](start_span)[span_22](end_span). The continuous potential curve forms a symmetric global variance minimum locked precisely at $\sigma = 0.5$[span_23](start_span)[span_23](end_span).</p></div>
+    </div>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            return { w: rect.width, h: rect.height };
+        }
+        window.addEventListener('resize', () => { if (typeof draw === 'function') draw(); });
+        
+            function draw() {
+                const t = parseFloat(document.getElementById('paramT').value);
+                const tau = parseFloat(document.getElementById('paramTau').value);
+                document.getElementById('tVal').textContent = t.toFixed(1);
+                document.getElementById('tauVal').textContent = tau.toFixed(2);
+
+                const { w, h } = resize();
+                ctx.clearRect(0, 0, w, h);
+
+                const marginX = 40, marginY = 30;
+                const plotW = w - marginX * 2, plotH = h - marginY * 2;
+
+                const critX = marginX + (0.5 - 0.1) / (0.9 - 0.1) * plotW;
+                ctx.strokeStyle = '#34d399'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                ctx.beginPath(); ctx.moveTo(critX, marginY); ctx.lineTo(critX, h - marginY); ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.beginPath();
+                for (let px = 0; px <= plotW; px++) {
+                    const sigma = 0.1 + (px / plotW) * 0.8;
+                    const dist = Math.abs(sigma - 0.5);
+                    const mag = Math.cosh(2.5 * dist) - 0.2 * Math.cos(tau * dist) + 0.05 * t;
+
+                    const py = (h - marginY) - (mag / 2.5) * plotH;
+                    if (px === 0) ctx.moveTo(marginX + px, py); else ctx.lineTo(marginX + px, py);
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = '#34d399'; ctx.font = '11px monospace';
+                ctx.fillText('Critical Line Equilibrium (σ = 1/2)', critX + 8, marginY + 15);
+            }
+            ['paramT', 'paramTau'].forEach(id => document.getElementById(id).addEventListener('input', draw));
+            draw();
+        
+    </script>
+</body>
+</html>

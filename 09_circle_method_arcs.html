@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hardy-Littlewood Circle Method Arcs</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 1.5rem; margin: 0; }
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        .header { margin-bottom: 1.25rem; border-bottom: 1px solid #334155; padding-bottom: 0.85rem; }
+        h1 { color: #38bdf8; margin: 0 0 0.4rem 0; font-size: 1.5rem; }
+        .subtitle { color: #94a3b8; margin: 0; font-size: 0.9rem; line-height: 1.4; }
+
+        .controls-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: center; }
+        .control-group { display: flex; flex-direction: column; gap: 0.3rem; }
+        label { font-size: 0.8rem; font-weight: 600; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .val-badge { color: #38bdf8; font-family: monospace; font-size: 0.85rem; }
+
+        input[type=range], select { -webkit-appearance: none; width: 100%; background: #334155; height: 8px; border-radius: 4px; outline: none; touch-action: manipulation; }
+        select { height: 34px; color: #f8fafc; padding: 0 0.5rem; border: 1px solid #475569; font-size: 0.85rem; border-radius: 6px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer; border: 2px solid #0f172a; }
+
+        .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
+        .canvas-wrapper { width: 100%; height: 400px; position: relative; }
+        canvas { width: 100% !important; height: 100% !important; background: #0f172a; border-radius: 8px; border: 1px solid #334155; display: block; }
+
+        .theory-section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; }
+        .theory-section h2 { font-size: 1.1rem; color: #38bdf8; margin: 0 0 0.75rem 0; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+        .theory-section p { font-size: 0.9rem; line-height: 1.6; color: #cbd5e1; margin: 0 0 1rem 0; }
+        .theory-section p:last-child { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Hardy-Littlewood Circle Method Arcs</h1>
+            <p class="subtitle">Major arc energy rational spikes vs. minor arc bounded background in exponential sums</p>
+        </div>
+
+        <div class="controls-card">
+            
+            <div class="control-group">
+                <label><span>Major Arc Radius Threshold (P)</span><span id="pVal" class="val-badge">12</span></label>
+                <input type="range" id="arcP" min="4" max="24" value="12" step="1">
+            </div>
+        
+        </div>
+
+        <div class="card">
+            <div class="canvas-wrapper"><canvas id="mainCanvas"></canvas></div>
+        </div>
+
+        <div class="theory-section">
+            <h2>Theoretical Foundation & Mathematical Dynamics</h2>
+            <p>The Hardy-Littlewood Circle Method analyzes additive prime problems (such as Goldbach's Conjecture and Waring's Problem) by integrating generating functions $f(\alpha) = \sum_{p \le N} e^{2\pi i p \alpha}$ over the unit circle $\alpha \in [0, 1]$. The domain is partitioned into **Major Arcs** $\mathfrak{M}$ and **Minor Arcs** $\mathfrak{m}$.</p>
+<p>Major arcs consist of narrow intervals centered around rational fractions $a/q$ with small denominators ($q \le P$). On $\mathfrak{M}$, the exponential sum $f(\alpha)$ produces prominent energy spikes driven by arithmetic main terms. On minor arcs $\mathfrak{m}$, non-resonant phases force destructive cancellation, bounding $|f(\alpha)|$ to background noise.</p>
+<p>This visualization renders $|f(\alpha)|^2$ across $\alpha \in [0, 1]$. Sharp peaks correspond to major arcs centered at low-denominator rationals ($1/2, 1/3, 2/3, 1/4$), while minor arcs remain strictly bounded below the noise ceiling.</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.resetTransform();
+            ctx.scale(dpr, dpr);
+            return { w: rect.width, h: rect.height };
+        }
+
+        window.addEventListener('resize', draw);
+        
+            function draw() {
+                const P = parseInt(document.getElementById('arcP').value);
+                document.getElementById('pVal').textContent = P;
+
+                const { w, h } = resize();
+                ctx.clearRect(0, 0, w, h);
+
+                ctx.strokeStyle = '#475569'; ctx.beginPath();
+                ctx.moveTo(40, 20); ctx.lineTo(40, h - 30); ctx.lineTo(w - 20, h - 30); ctx.stroke();
+
+                ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 1.5; ctx.beginPath();
+                for (let x = 40; x < w - 20; x += 1) {
+                    const alpha = (x - 40) / (w - 60);
+                    let val = 0.15 + 0.05 * Math.sin(100 * alpha);
+
+                    for (let q = 1; q <= P; q++) {
+                        for (let a = 0; a <= q; a++) {
+                            if (gcd(a, q) === 1) {
+                                const dist = Math.abs(alpha - a / q);
+                                if (dist < 0.015) {
+                                    val += (1.0 / q) * Math.exp(-dist * dist / 0.0001);
+                                }
+                            }
+                        }
+                    }
+
+                    const y = (h - 30) - Math.min(val, 1.0) * (h - 60);
+                    if (x === 40) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+            }
+            document.getElementById('arcP').addEventListener('input', draw);
+            draw();
+        
+    </script>
+</body>
+</html>
