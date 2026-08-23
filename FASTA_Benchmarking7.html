@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Universal Anti-Parallel Information Systems (UAPIS) | Research Portal</title>
+
+<style>
+
+:root {
+
+--bg-color: #fcfcfc;
+
+--sidebar-bg: #f4f5f7;
+
+--text-color: #2c3e50;
+
+--accent-color: #2980b9;
+
+--border-color: #dcdde1;
+
+--code-bg: #edf2f7;
+
+--card-bg: #ffffff;
+
+}
+
+body {
+
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+margin: 0;
+
+padding: 0;
+
+background-color: var(--bg-color);
+
+color: var(--text-color);
+
+display: flex;
+
+min-height: 100vh;
+
+}
+
+nav {
+
+width: 260px;
+
+background-color: var(--sidebar-bg);
+
+border-right: 1px solid var(--border-color);
+
+padding: 30px 20px;
+
+position: fixed;
+
+height: 100%;
+
+box-sizing: border-box;
+
+overflow-y: auto;
+
+}
+
+nav h2 {
+
+font-size: 1.1rem;
+
+color: var(--accent-color);
+
+margin-top: 0;
+
+margin-bottom: 20px;
+
+text-transform: uppercase;
+
+letter-spacing: 0.5px;
+
+}
+
+nav ul {
+
+list-style: none;
+
+padding: 0;
+
+margin: 0;
+
+}
+
+nav li {
+
+margin-bottom: 12px;
+
+}
+
+nav a {
+
+color: var(--text-color);
+
+text-decoration: none;
+
+font-size: 0.95rem;
+
+display: block;
+
+padding: 6px 10px;
+
+border-radius: 4px;
+
+transition: background 0.2s;
+
+}
+
+nav a:hover {
+
+background-color: #e2e8f0;
+
+color: var(--accent-color);
+
+}
+
+main {
+
+margin-left: 260px;
+
+padding: 40px 60px;
+
+max-width: 900px;
+
+box-sizing: border-box;
+
+flex-grow: 1;
+
+}
+
+h1 {
+
+font-size: 2.2rem;
+
+color: #1a252f;
+
+margin-top: 0;
+
+border-bottom: 2px solid var(--border-color);
+
+padding-bottom: 15px;
+
+}
+
+h2 {
+
+font-size: 1.5rem;
+
+color: var(--accent-color);
+
+margin-top: 40px;
+
+}
+
+h3 {
+
+font-size: 1.2rem;
+
+color: #34495e;
+
+}
+
+p, li {
+
+line-height: 1.6;
+
+font-size: 1rem;
+
+}
+
+.card {
+
+background: var(--card-bg);
+
+border: 1px solid var(--border-color);
+
+border-radius: 6px;
+
+padding: 25px;
+
+margin: 25px 0;
+
+box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+
+}
+
+pre {
+
+background-color: var(--code-bg);
+
+padding: 15px;
+
+border-radius: 5px;
+
+overflow-x: auto;
+
+font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+
+font-size: 0.9rem;
+
+border: 1px solid #cbd5e0;
+
+}
+
+code {
+
+font-family: SFMono-Regular, Consolas, Menlo, monospace;
+
+background-color: var(--code-bg);
+
+padding: 2px 5px;
+
+border-radius: 3px;
+
+}
+
+table {
+
+width: 100%;
+
+border-collapse: collapse;
+
+margin: 20px 0;
+
+font-size: 0.95rem;
+
+}
+
+th, td {
+
+border: 1px solid var(--border-color);
+
+padding: 10px 14px;
+
+text-align: left;
+
+}
+
+th {
+
+background-color: var(--sidebar-bg);
+
+color: #1a252f;
+
+}
+
+.workbench {
+
+background: #ffffff;
+
+border: 2px dashed var(--accent-color);
+
+border-radius: 8px;
+
+padding: 30px;
+
+margin-top: 30px;
+
+}
+
+.btn {
+
+background-color: var(--accent-color);
+
+color: white;
+
+border: none;
+
+padding: 10px 20px;
+
+font-size: 1rem;
+
+border-radius: 4px;
+
+cursor: pointer;
+
+transition: background 0.2s;
+
+margin-right: 10px;
+
+margin-bottom: 10px;
+
+}
+
+.btn:hover {
+
+background-color: #1f618d;
+
+}
+
+.btn-secondary {
+
+background-color: #7f8c8d;
+
+}
+
+.btn-secondary:hover {
+
+background-color: #616a6b;
+
+}
+
+input[type="file"] {
+
+margin: 15px 0;
+
+display: block;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<nav>
+
+<h2>UAPIS Portal</h2>
+
+<ul>
+
+<li><a href="#summary">1. Executive Summary</a></li>
+
+<li><a href="#architecture">2. Core Architecture</a></li>
+
+<li><a href="#triad">3. The Cross-Disciplinary Triad</a></li>
+
+<li><a href="#pipeline">4. Genomic Pipeline</a></li>
+
+<li><a href="#workbench">5. Interactive Workbench</a></li>
+
+</ul>
+
+</nav>
+
+<main>
+
+<h1>Universal Anti-Parallel Information Systems (UAPIS)</h1>
+
+<section id="summary">
+
+<h2>1. Executive Summary & Foundational Premise</h2>
+
+<p>Across vastly disparate domains—ranging from prime number distributions in analytic number theory and genetic base-pairing in molecular biology to macroscopic plasma currents in astrophysics—nature relies on a universal architectural motif: dual, opposing tracks locked into strict anti-parallel phase opposition.</p>
+
+<p>Building upon our previous work with the Trinary Symmetry Framework, this project generalizes the mechanism into a universal framework for trace-class operator spectral mapping and noise-suppression signal extraction.</p>
+
+</section>
+
+<section id="architecture">
+
+<h2>2. Core Mathematical Architecture</h2>
+
+<div class="card">
+
+<ul>
+
+<li><strong>Unitary Coordinate Gauges:</strong> Mapping discrete positional data onto continuous logarithmic grids to eliminate irrational boundary dispersion.</li>
+
+<li><strong>The Anti-Parallel Phase Engine:</strong> Applying exponential phase-locking operators to enforce 180-degree destructive interference on background noise components while preserving true structural signal supports.</li>
+
+<li><strong>Spectral Rigidity & Stability Gaps:</strong> Ensuring Hilbert-Schmidt norm boundedness guarantees discrete, real energy eigenvalues whose spectral gaps quantify system robustness.</li>
+
+</ul>
+
+</div>
+
+</section>
+
+<section id="triad">
+
+<h2>3. The Cross-Disciplinary Triad</h2>
+
+<ul>
+
+<li><strong>Pillar I: Arithmetic (Analytic Number Theory) —</strong> Dirichlet series and distribution of prime numbers over mod-6 tracks via Weil-Guinand explicit trace formulas.</li>
+
+<li><strong>Pillar II: Genetics (Molecular Biology) —</strong> Quaternary nucleotide polarity mapping using trace-class transfer operator matrices to isolate conserved reading frames.</li>
+
+<li><strong>Pillar III: Cosmology (Astrophysics) —</strong> Macroscopic plasma streams and Birkeland current pairs balancing magnetic reconnection and energy transport.</li>
+
+</ul>
+
+</section>
+
+<section id="pipeline">
+
+<h2>4. Computational Implementation: Genomic FASTA Benchmarking Pipeline</h2>
+
+<p>Researchers can inspect the core Python benchmarking routine below, or use the interactive workbench to evaluate genomic sequences.</p>
+
+<pre><code>import numpy as np
+
+from Bio import SeqIO
+
+def benchmark_sequence_types(fasta_filepath: str):
+
+records = list(SeqIO.parse(fasta_filepath, "fasta"))
+
+for record in records:
+
+seq = str(record.seq).upper().replace("U", "T")
+
+seq = "".join([b for b in seq if b in "ATCG"])
+
+N = len(seq)
+
+if N < 30: continue
+
+polarity = np.array([1.0 if base in "AG" else -1.0 for base in seq])
+
+phase_engine = np.exp(1j * np.pi * (polarity - 1.0) / 2.0)
+
+raw_variance = np.var(np.cumsum(polarity))
+
+modulated_variance = np.var(np.cumsum(phase_engine.real))
+
+suppression_ratio = modulated_variance / (raw_variance + 1e-10)
+
+print(f"{record.id} | Length: {N} | Ratio: {suppression_ratio:.4f}")</code></pre>
+
+</section>
+
+<section id="workbench" class="workbench">
+
+<h2>5. Interactive Researcher Workbench</h2>
+
+<p>Upload your own FASTA file or click the sample dataset button to run local anti-parallel phase engine evaluation instantly:</p>
+
+<button class="btn btn-secondary" type="button" onclick="loadSampleData()">Load Embedded Sample Dataset</button>
+
+<input type="file" id="fasta-file-input" accept=".fasta,.fa,.txt">
+
+<button class="btn" type="button" onclick="processUploadedFile()">Run Phase Suppression Analysis</button>
+
+<div id="output-container"></div>
+
+</section>
+
+</main>
+
+<script>
+
+const sampleFastaContent = ">Human_GAPDH_Exon_Fragment\nGCCAGGTGACCCTCCCGCTTCGCTCTCTGCTCCTCCTGTTCGACAGTCAGCCGCATCTT\nCTTTTGCGTCGCCAGCCGAGCCACATCGCTCAGACACCATGGGGAAGGTGAAGGTCGGAGTCAAC\n>Synthetic_Random_Drift_Model\nATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG\nATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG\n>Human_tRNA_Asn_Fragment\nGCCTCGTTGGCGCAACGGATCGAGCGCCTGCTAAGCGCGCGGTCAG\n>Dinucleotide_Repeat_Control\nATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATAT\nATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATAT";
+
+function loadSampleData() {
+
+parseAndAnalyze(sampleFastaContent, "Embedded Sample Dataset");
+
+}
+
+function processUploadedFile() {
+
+const fileInput = document.getElementById('fasta-file-input');
+
+if (!fileInput.files.length) {
+
+alert('Please select a valid FASTA file first.');
+
+return;
+
+}
+
+const file = fileInput.files[0];
+
+const reader = new FileReader();
+
+reader.onload = function(e) {
+
+parseAndAnalyze(e.target.result, file.name);
+
+};
+
+reader.readAsText(file);
+
+}
+
+function parseAndAnalyze(text, sourceLabel) {
+
+const container = document.getElementById('output-container');
+
+if (!container) return;
+
+const lines = text.split(/\r?\n/);
+
+let records = [];
+
+let currentId = "Unknown_Sequence";
+
+let currentSeq = "";
+
+for (let line of lines) {
+
+line = line.trim();
+
+if (line.startsWith('>')) {
+
+if (currentSeq.length > 0) {
+
+records.push({id: currentId, seq: currentSeq});
+
+}
+
+currentId = line.substring(1).split(' ')[0];
+
+currentSeq = "";
+
+} else {
+
+currentSeq += line;
+
+}
+
+}
+
+if (currentSeq.length > 0) {
+
+records.push({id: currentId, seq: currentSeq});
+
+}
+
+if (records.length === 0) {
+
+container.innerHTML = '<p style="color: red;">[!] No valid FASTA records detected.</p>';
+
+return;
+
+}
+
+let html = '<h3>Analysis Results (' + sourceLabel + ')</h3>';
+
+html += '<table><tr><th>Sequence ID</th><th>Length (bp)</th><th>Suppression Ratio (R)</th><th>Classification</th></tr>';
+
+records.forEach(rec => {
+
+const cleanSeq = rec.seq.toUpperCase().replace(/U/g, 'T').replace(/[^ATCG]/g, '');
+
+const N = cleanSeq.length;
+
+if (N < 5) return;
+
+let polarity = [];
+
+for (let char of cleanSeq) {
+
+polarity.push((char === 'A' || char === 'G') ? 1.0 : -1.0);
+
+}
+
+// Compute step-wise fluctuations rather than raw cumulative variance drift
+
+let rawDiffs = [];
+
+for(let i=1; i<polarity.length; i++) {
+
+rawDiffs.push(polarity[i] - polarity[i-1]);
+
+}
+
+const rawVar = variance(rawDiffs.length ? rawDiffs : polarity);
+
+let phaseReal = [];
+
+polarity.forEach(p => {
+
+let angle = p * Math.PI / 2.0;
+
+phaseReal.push(Math.sin(angle));
+
+});
+
+let phaseDiffs = [];
+
+for(let i=1; i<phaseReal.length; i++) {
+
+phaseDiffs.push(phaseReal[i] - phaseReal[i-1]);
+
+}
+
+const modVar = variance(phaseDiffs.length ? phaseDiffs : phaseReal);
+
+let ratio = modVar / (rawVar + 1e-6);
+
+let classification = "Random Drift / Noise";
+
+if (ratio < 0.45) {
+
+classification = "Conserved Coding (Strong)";
+
+} else if (ratio < 0.95) {
+
+classification = "Structured Regulatory";
+
+}
+
+html += '<tr><td>' + rec.id + '</td><td>' + N + '</td><td><code>' + ratio.toFixed(4) + '</code></td><td>' + classification + '</td></tr>';
+
+});
+
+html += '</table>';
+
+container.innerHTML = html;
+
+}
+
+function variance(arr) {
+
+const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+
+const sqDiffs = arr.map(value => Math.pow(value - mean, 2));
+
+return sqDiffs.reduce((a, b) => a + b, 0) / arr.length;
+
+}
+
+</script>
+
+</body>
+
+</html>
+
