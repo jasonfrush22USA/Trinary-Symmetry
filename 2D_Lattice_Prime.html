@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinary Symmetry Framework - 2D Lattice Search Graph</title>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #212529;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+        }
+        h2 {
+            margin-top: 0;
+            color: #1a252f;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            background: #f1f3f5;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        select, input[type="range"] {
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+            font-size: 0.95rem;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .metric-card .value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2b6cb0;
+        }
+        .metric-card .title {
+            font-size: 0.75rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .chart-box {
+            position: relative;
+            width: 100%;
+            height: 420px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>360-Spoke Wheel Prime Indicator Tracker</h2>
+    <p>Direct 2D Lattice Hyperbola Evaluation: <code>f(x, y, R<sub>a</sub>, R<sub>b</sub>) = 360xy + xR<sub>b</sub> + yR<sub>a</sub> + ⌊R<sub>a</sub>R<sub>b</sub> / 360⌋ = k</code></p>
+
+    <!-- Interactive Controls -->
+    <div class="controls">
+        <div class="control-group">
+            <label for="spokeSelect">Active Channel (Spoke R)</label>
+            <select id="spokeSelect">
+                <option value="7">Spoke 7</option>
+                <option value="11">Spoke 11 (Twin Pair A)</option>
+                <option value="13">Spoke 13 (Twin Pair B)</option>
+                <option value="107">Spoke 107</option>
+                <option value="109">Spoke 109</option>
+                <option value="191">Spoke 191</option>
+                <option value="193">Spoke 193</option>
+            </select>
+        </div>
+
+        <div class="control-group" style="flex-grow: 1;">
+            <label for="kSlider">Max Rotations (k<sub>max</sub>): <span id="kVal">35</span></label>
+            <input type="range" id="kSlider" min="5" max="200" value="35" step="5">
+        </div>
+    </div>
+
+    <!-- Live Readout Cards -->
+    <div class="metrics">
+        <div class="metric-card">
+            <div class="title">Max Integer n</div>
+            <div class="value" id="maxN">12,607</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Primes Counted</div>
+            <div class="value" id="primeCount">18</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Expected Baseline</div>
+            <div class="value" id="expBase">13.91</div>
+        </div>
+        <div class="metric-card">
+            <div class="title">Discrepancy |Δ_R(k)|</div>
+            <div class="value" id="discrepancy">4.09</div>
+        </div>
+    </div>
+
+    <!-- Graph Container -->
+    <div class="chart-box">
+        <canvas id="spokeChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // Pre-calculate the 96 active coprime residues in Z/360Z
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+    const ACTIVE_RESIDUES = [];
+    for (let r = 1; r < 360; r++) {
+        if (gcd(r, 360) === 1) ACTIVE_RESIDUES.push(r);
+    }
+
+    // Exact 2D Lattice Hyperbola Search based on Master Index Generator
+    function isPrimeLattice(k, R) {
+        if (k === 0) {
+            return R > 1; // Base prime case for rotation 0
+        }
+
+        // Iterate over all coprime residue factor pairs Ra * Rb ≡ R (mod 360)
+        for (let i = 0; i < ACTIVE_RESIDUES.length; i++) {
+            const Ra = ACTIVE_RESIDUES[i];
+            for (let j = 0; j < ACTIVE_RESIDUES.length; j++) {
+                const Rb = ACTIVE_RESIDUES[j];
+
+                if ((Ra * Rb) % 360 !== R) continue;
+
+                const floorOffset = Math.floor((Ra * Rb) / 360);
+                
+                // Maximum possible bound for x occurs when y = 0
+                const maxX = Math.floor((k - floorOffset) / Rb);
+
+                for (let x = 0; x <= maxX; x++) {
+                    // Unit boundary protection: factor 1 = 360x + Ra > 1
+                    if (360 * x + Ra === 1) continue;
+
+                    // Solve 360*x*y + x*Rb + y*Ra + floorOffset = k for integer y:
+                    // y * (360*x + Ra) = k - x*Rb - floorOffset
+                    const numerator = k - (x * Rb) - floorOffset;
+                    const denominator = 360 * x + Ra;
+
+                    if (numerator < 0) break;
+
+                    if (numerator % denominator === 0) {
+                        const y = numerator / denominator;
+                        // Unit boundary protection: factor 2 = 360y + Rb > 1
+                        if (y >= 0 && (360 * y + Rb > 1)) {
+                            // Valid integer lattice point (x, y) found -> k is COMPOSITE
+                            return false; 
+                        }
+                    }
+                }
+            }
+        }
+        // Zero lattice intersections found -> k is PRIME
+        return true; 
+    }
+
+    // Chart initialization
+    const ctx = document.getElementById('spokeChart').getContext('2d');
+    let spokeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Accumulated Primes π_R(k)',
+                    data: [],
+                    borderColor: '#2b6cb0',
+                    backgroundColor: '#2b6cb0',
+                    borderWidth: 2,
+                    stepped: true,
+                    pointRadius: 1,
+                },
+                {
+                    label: 'Expected Baseline (n / 96 ln n)',
+                    data: [],
+                    borderColor: '#dd6b20',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Rotation Index k' },
+                    grid: { color: '#e9ecef' }
+                },
+                y: {
+                    title: { display: true, text: 'Count / Density' },
+                    grid: { color: '#e9ecef' }
+                }
+            },
+            plugins: {
+                legend: { position: 'top' }
+            }
+        }
+    });
+
+    // Main Update Function
+    function updateData() {
+        const R = parseInt(document.getElementById('spokeSelect').value);
+        const kMax = parseInt(document.getElementById('kSlider').value);
+        document.getElementById('kVal').innerText = kMax;
+
+        let ks = [];
+        let primeSums = [];
+        let expectedWeights = [];
+        let count = 0;
+
+        for (let k = 1; k <= kMax; k++) {
+            const n = 360 * k + R;
+            
+            // Evaluated directly via 2D Hyperbola Lattice Intersection
+            if (isPrimeLattice(k, R)) {
+                count++;
+            }
+            const expected = (n / Math.log(n)) / 96.0;
+
+            ks.push(k);
+            primeSums.push(count);
+            expectedWeights.push(expected);
+        }
+
+        const finalN = 360 * kMax + R;
+        const finalExpected = expectedWeights[expectedWeights.length - 1];
+        const finalDiscrepancy = Math.abs(count - finalExpected);
+
+        // Update HTML metrics
+        document.getElementById('maxN').innerText = finalN.toLocaleString();
+        document.getElementById('primeCount').innerText = count;
+        document.getElementById('expBase').innerText = finalExpected.toFixed(2);
+        document.getElementById('discrepancy').innerText = finalDiscrepancy.toFixed(2);
+
+        // Update Chart
+        spokeChart.data.labels = ks;
+        spokeChart.data.datasets[0].data = primeSums;
+        spokeChart.data.datasets[1].data = expectedWeights;
+        spokeChart.update();
+    }
+
+    // Event Listeners
+    document.getElementById('spokeSelect').addEventListener('change', updateData);
+    document.getElementById('kSlider').addEventListener('input', updateData);
+
+    // Initial render
+    updateData();
+</script>
+
+</body>
+</html>

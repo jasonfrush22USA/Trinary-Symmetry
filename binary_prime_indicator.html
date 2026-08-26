@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Binary Prime Indicator 1_P(n)</title>
+  <!-- Chart.js and Zoom Plugin -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid #e9ecef;
+    }
+    .controls {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      background: #f1f3f5;
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    .chart-box {
+      position: relative;
+      width: 100%;
+      height: 380px;
+    }
+    .explanation {
+      margin-top: 24px;
+      line-height: 1.6;
+      color: #495057;
+      border-top: 1px solid #e9ecef;
+      padding-top: 16px;
+    }
+    .explanation h3 {
+      color: #212529;
+      margin-bottom: 8px;
+    }
+    .reset-btn {
+      background-color: #e2e8f0;
+      border: 1px solid #cbd5e0;
+      padding: 4px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .reset-btn:hover {
+      background-color: #cbd5e0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Binary Prime Indicator Function 1_P(360k + R)</h2>
+    <p>Plots raw output: <b>1</b> (Prime / No hyperbola lattice solution) vs <b>0</b> (Composite / Hyperbola lattice solution found).</p>
+    
+    <div class="controls">
+      <div>
+        <label for="spokeSelect"><b>Spoke R:</b> </label>
+        <select id="spokeSelect">
+          <option value="7">Spoke 7</option>
+          <option value="11">Spoke 11</option>
+          <option value="13">Spoke 13</option>
+          <option value="107">Spoke 107</option>
+          <option value="109">Spoke 109</option>
+        </select>
+      </div>
+      <div style="flex-grow: 1;">
+        <label for="kSlider"><b>Rotation Range (k=1 to <span id="kVal">50</span>):</b> </label>
+        <input type="range" id="kSlider" min="10" max="1024" value="50" step="1" style="width: 55%;">
+      </div>
+      <button class="reset-btn" id="resetZoom">Reset Zoom</button>
+    </div>
+
+    <div class="chart-box">
+      <canvas id="binaryChart"></canvas>
+    </div>
+
+       <div class="explanation">
+      <h3>Mathematical Framework</h3>
+      <p>
+        The indicator function evaluates integers of the form <i>N</i> = 360<i>k</i> + <i>R</i>, where <i>R</i> represents a residue coprime to the base modulus 360 = 2<sup>3</sup> &times; 3<sup>2</sup> &times; 5 (often visualised as a radial spoke on a 360-degree wheel). By restricting structural evaluation to spokes where gcd(<i>R</i>, 360) = 1, all trivial multiples of 2, 3, and 5 are filtered out automatically.
+      </p>
+      <p>
+        A composite candidate on spoke <i>R</i> exists if and only if <i>N</i> can be factored into <i>A</i> &times; <i>B</i> = (360<i>x</i> + <i>R<sub>a</sub></i>)(360<i>y</i> + <i>R<sub>b</sub></i>), where (<i>R<sub>a</sub></i> &times; <i>R<sub>b</sub></i>) &equiv; <i>R</i> (mod 360). Geometrically, this transformation projects potential factors onto integer lattice points lying along hyperbolic curves. When no non-trivial integer lattice solution (<i>x</i>, <i>y</i>) intersects the hyperbola corresponding to 360<i>k</i> + <i>R</i>, the indicator yields 1<sub>P</sub>(<i>N</i>) = 1 (Prime); otherwise, the presence of a valid lattice point causes 1<sub>P</sub>(<i>N</i>) to collapse to 0 (Composite).
+      </p>
+    </div>
+
+
+  <script>
+    function indicator1P(k, R) {
+      const N = 360 * k + R;
+      if (N <= 1) return 0;
+      
+      const limit = Math.floor(Math.sqrt(N));
+      for (let d = 2; d <= limit; d++) {
+        if (N % d === 0) {
+          return 0; // Composite (lattice solution exists)
+        }
+      }
+      return 1; // Prime (zero lattice points)
+    }
+
+    const ctx = document.getElementById('binaryChart').getContext('2d');
+    let binaryChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: '1_P(360k + R)',
+          data: [],
+          backgroundColor: [],
+          barThickness: 'flex',
+          maxBarThickness: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { 
+            title: { display: true, text: 'Rotation Index k' },
+            ticks: { maxTicksLimit: 30 }
+          },
+          y: {
+            min: -0.1,
+            max: 1.2,
+            ticks: { stepSize: 1 },
+            title: { display: true, text: 'Indicator Value' }
+          }
+        },
+        plugins: {
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: 'x'
+            },
+            zoom: {
+              wheel: { enabled: true },
+              pinch: { enabled: true },
+              mode: 'x'
+            }
+          }
+        }
+      }
+    });
+
+    function update() {
+      const R = parseInt(document.getElementById('spokeSelect').value);
+      const kMax = parseInt(document.getElementById('kSlider').value);
+      document.getElementById('kVal').innerText = kMax;
+
+      let ks = [];
+      let vals = [];
+      let colors = [];
+
+      for (let k = 1; k <= kMax; k++) {
+        const val = indicator1P(k, R);
+        ks.push(`k=${k}`);
+        vals.push(val);
+        colors.push(val === 1 ? '#2b6cb0' : '#cbd5e0');
+      }
+
+      binaryChart.data.labels = ks;
+      binaryChart.data.datasets[0].data = vals;
+      binaryChart.data.datasets[0].backgroundColor = colors;
+      binaryChart.update();
+    }
+
+    document.getElementById('spokeSelect').addEventListener('change', update);
+    document.getElementById('kSlider').addEventListener('input', update);
+    document.getElementById('resetZoom').addEventListener('click', () => {
+      binaryChart.resetZoom();
+    });
+
+    update();
+  </script>
+</body>
+</html>

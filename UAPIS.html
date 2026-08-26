@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Universal Anti-Parallel Information Systems (UAPIS) | Research Portal</title>
+<!-- Chart.js for Signal Visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --bg-color: #f8fafc;
+  --sidebar-bg: #1e293b;
+  --sidebar-text: #f1f5f9;
+  --text-color: #0f172a;
+  --accent-color: #0284c7;
+  --accent-hover: #0369a1;
+  --border-color: #e2e8f0;
+  --code-bg: #0f172a;
+  --code-text: #38bdf8;
+  --card-bg: #ffffff;
+  --highlight: #e0f2fe;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Responsive Navigation */
+nav {
+  width: 280px;
+  background-color: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  padding: 30px 20px;
+  position: fixed;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+nav h2 {
+  font-size: 1.1rem;
+  color: #38bdf8;
+  margin-top: 0;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+nav li {
+  margin-bottom: 8px;
+}
+
+nav a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.95rem;
+  display: block;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+nav a:hover, nav a.active {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+main {
+  margin-left: 280px;
+  padding: 40px 50px;
+  max-width: 1100px;
+  box-sizing: border-box;
+  flex-grow: 1;
+}
+
+h1 {
+  font-size: 2.2rem;
+  color: #0f172a;
+  margin-top: 0;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 15px;
+}
+
+h2 {
+  font-size: 1.4rem;
+  color: var(--accent-color);
+  margin-top: 35px;
+}
+
+p, li {
+  line-height: 1.6;
+  font-size: 0.98rem;
+  color: #334155;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 25px;
+  margin: 20px 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+pre {
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: 18px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.88rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 0.9rem;
+}
+
+th, td {
+  border: 1px solid var(--border-color);
+  padding: 12px 14px;
+  text-align: left;
+}
+
+th {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+tr.selected-row {
+  background-color: var(--highlight);
+  font-weight: 500;
+}
+
+tr.clickable-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+tr.clickable-row:hover {
+  background-color: #f1f5f9;
+}
+
+/* Workbench Controls */
+.workbench {
+  background: #ffffff;
+  border: 2px solid var(--accent-color);
+  border-radius: 10px;
+  padding: 30px;
+  margin-top: 30px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.btn {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: #64748b;
+}
+
+.btn-secondary:hover {
+  background-color: #475569;
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--accent-color);
+  border: 1px solid var(--accent-color);
+}
+
+.btn-outline:hover {
+  background-color: #f0f9ff;
+}
+
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-label {
+  background-color: #e2e8f0;
+  color: #334155;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline-block;
+  transition: background 0.2s;
+}
+
+.file-label:hover {
+  background-color: #cbd5e1;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-strong { background: #dcfce7; color: #15803d; }
+.badge-mod { background: #fef9c3; color: #a16207; }
+.badge-noise { background: #fee2e2; color: #b91c1c; }
+
+/* Visualizer Container */
+.visualizer-container {
+  display: none;
+  margin-top: 25px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.chart-box {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 868px) {
+  body {
+    flex-direction: column;
+  }
+  nav {
+    width: 100%;
+    height: auto;
+    position: relative;
+    padding: 20px;
+  }
+  main {
+    margin-left: 0;
+    padding: 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>UAPIS Portal</h2>
+  <ul>
+    <li><a href="#summary" class="active">1. Executive Summary</a></li>
+    <li><a href="#architecture">2. Core Architecture</a></li>
+    <li><a href="#triad">3. Cross-Disciplinary Triad</a></li>
+    <li><a href="#pipeline">4. Genomic Pipeline</a></li>
+    <li><a href="#workbench">5. Interactive Workbench</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1>Universal Anti-Parallel Information Systems (UAPIS)</h1>
+
+  <section id="summary">
+    <h2>1. Executive Summary & Foundational Premise</h2>
+    <p>Across vastly disparate domains—ranging from prime number distributions in analytic number theory to genetic base-pairing in molecular biology and macroscopic plasma currents in astrophysics—nature relies on a universal architectural motif: dual, opposing tracks locked into strict anti-parallel phase opposition.</p>
+    <p>Building upon the Trinary Symmetry Framework, UAPIS generalizes these dynamics into a unified operator framework for trace-class spectral mapping and noise-suppression signal extraction.</p>
+  </section>
+
+  <section id="architecture">
+    <h2>2. Core Mathematical Architecture</h2>
+    <div class="card">
+      <ul>
+        <li><strong>Unitary Coordinate Gauges:</strong> Mappings that convert discrete positional dynamics onto continuous logarithmic manifolds to eliminate irrational boundary dispersion.</li>
+        <li><strong>Anti-Parallel Phase Engine:</strong> Exponential phase-locking operators enforcing $180^\circ$ destructive interference on stochastic noise while preserving structural signal supports.</li>
+        <li><strong>Spectral Rigidity & Stability Gaps:</strong> Bounded Hilbert-Schmidt operator norms guaranteeing discrete real energy eigenvalues whose spectral gaps quantify systemic robustness.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="triad">
+    <h2>3. The Cross-Disciplinary Triad</h2>
+    <ul>
+      <li><strong>Pillar I: Arithmetic —</strong> Dirichlet series and prime distributions across Mod-6 modular tracks via explicit trace formulas.</li>
+      <li><strong>Pillar II: Genetics —</strong> Quaternary nucleotide polarity mapping using transfer operator matrices to isolate conserved reading frames.</li>
+      <li><strong>Pillar III: Cosmology —</strong> Birkeland current pairs balancing magnetic reconnection and plasma energy transport.</li>
+    </ul>
+  </section>
+
+  <section id="pipeline">
+    <h2>4. Computational Implementation</h2>
+    <p>Core evaluation pipeline in Python for standalone HPC benchmarking:</p>
+<pre><code>import numpy as np
+from Bio import SeqIO
+
+def compute_suppression_spectrum(seq: str):
+    # Pure Purine (+1) vs Pyrimidine (-1) polarity walk
+    polarity = np.array([1.0 if b in "AG" else -1.0 for b in seq])
+    N = len(polarity)
+    
+    # Modulo-6 Angular Phase Modulation
+    indices = np.arange(N)
+    phase_angles = (indices * np.pi / 3.0) + (polarity * np.pi / 2.0)
+    phase_engine = np.cos(phase_angles)
+    
+    raw_var = np.var(np.cumsum(polarity))
+    mod_var = np.var(np.cumsum(phase_engine))
+    
+    suppression_ratio = mod_var / (raw_var + 1e-10)
+    return suppression_ratio</code></pre>
+  </section>
+
+  <section id="workbench" class="workbench">
+    <h2>5. Interactive Researcher Workbench</h2>
+    <p>Run client-side trace analysis on custom FASTA datasets or test against verified genomic controls:</p>
+    
+    <div class="button-group">
+      <button class="btn btn-secondary" type="button" onclick="loadSampleData()">Load Control Dataset</button>
+      
+      <div class="file-input-wrapper">
+        <label for="fasta-file-input" class="file-label">Choose FASTA File...</label>
+        <input type="file" id="fasta-file-input" accept=".fasta,.fa,.txt" onchange="updateFileName()">
+      </div>
+      <span id="file-name-display" style="font-size: 0.85rem; color: #64748b;">No file selected</span>
+
+      <button class="btn" type="button" onclick="processUploadedFile()">Run Phase Analysis</button>
+      <button class="btn btn-outline" id="export-csv-btn" style="display:none;" onclick="exportResultsCSV()">Export Data (CSV)</button>
+    </div>
+
+    <div id="output-container"></div>
+
+    <!-- Interactive Signal Plot -->
+    <div id="visualizer" class="visualizer-container">
+      <div class="chart-header">
+        <div>
+          <h3 id="chart-title" style="margin:0; color:#0f172a;">Signal Walk Comparison</h3>
+          <span id="chart-subtitle" style="font-size:0.85rem; color:#64748b;">Click any table row to inspect sequence trajectory</span>
+        </div>
+        <button class="btn btn-outline" onclick="downloadChartPNG()">Save Chart PNG</button>
+      </div>
+      <div class="chart-box">
+        <canvas id="signalChart"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// Expanded Dataset Suite
+const sampleFastaContent = `>Human_GAPDH_Exon_Fragment
+GCCAGGTGACCCTCCCGCTTCGCTCTCTGCTCCTCCTGTTCGACAGTCAGCCGCATCTTCTTTTGCGTCGCCAGCCGAGCCACATCGCTCAGACACCATGGGGAAGGTGAAGGTCGGAGTCAAC
+>SARS_CoV2_Spike_Fragment
+ATGTTTGTTTTTCTTGTTTTATTGCCACTAGTCTCTAGTCAGTGTGTTAATCTTACAACCAGAACTCAATTACCCCCTGCATACACTAATTCTTTCACACGTGGTGTTTATTACCCTGACAAAGTT
+>Human_mtDNA_DLoop_Fragment
+GATCACAGGTCTATCACCCTATTAACCACTCACGGGAGCTCTCCATGCATTTGGTATTTTCGTCTGGGGGGTATGCACGCGATAGCATTGCGAGACGCTGGAGCCGGAGCACCCTATGTCGCAGT
+>Synthetic_Random_Drift_Control
+ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG
+>Dinucleotide_Repeat_Control
+ATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATATAT`;
+
+let processedRecords = [];
+let chartInstance = null;
+
+function updateFileName() {
+  const input = document.getElementById('fasta-file-input');
+  const display = document.getElementById('file-name-display');
+  if (input.files.length > 0) {
+    display.innerText = input.files[0].name;
+  }
+}
+
+function loadSampleData() {
+  parseAndAnalyze(sampleFastaContent, "Verified Benchmark Suite");
+}
+
+function processUploadedFile() {
+  const fileInput = document.getElementById('fasta-file-input');
+  if (!fileInput.files.length) {
+    alert('Please select a valid FASTA file first.');
+    return;
+  }
+  const file = fileInput.files[0];
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    parseAndAnalyze(e.target.result, file.name);
+  };
+  reader.readAsText(file);
+}
+
+function parseAndAnalyze(text, sourceLabel) {
+  const container = document.getElementById('output-container');
+  const lines = text.split(/\r?\n/);
+  let records = [];
+  let currentId = "Unknown_Sequence";
+  let currentSeq = "";
+
+  for (let line of lines) {
+    line = line.trim();
+    if (line.startsWith('>')) {
+      if (currentSeq.length > 0) {
+        records.push({id: currentId, seq: currentSeq});
+      }
+      currentId = line.substring(1).split(' ')[0];
+      currentSeq = "";
+    } else {
+      currentSeq += line;
+    }
+  }
+  if (currentSeq.length > 0) {
+    records.push({id: currentId, seq: currentSeq});
+  }
+
+  if (records.length === 0) {
+    container.innerHTML = '<p style="color: #ef4444; font-weight:600;">[!] No valid FASTA records detected.</p>';
+    return;
+  }
+
+  processedRecords = [];
+  
+  let html = `<h3>Analysis Results (${sourceLabel})</h3>`;
+  html += `<table id="results-table">
+    <thead>
+      <tr>
+        <th>Sequence ID</th>
+        <th>Length (bp)</th>
+        <th>Suppression Ratio (R)</th>
+        <th>Spectral Power (Sp)</th>
+        <th>Classification</th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  records.forEach((rec, idx) => {
+    const cleanSeq = rec.seq.toUpperCase().replace(/U/g, 'T').replace(/[^ATCG]/g, '');
+    const N = cleanSeq.length;
+    if (N < 10) return;
+
+    let polarity = [];
+    for (let char of cleanSeq) {
+      polarity.push((char === 'A' || char === 'G') ? 1.0 : -1.0);
+    }
+
+    // Cumulative raw walk
+    let cumPolarity = [];
+    let sum = 0;
+    polarity.forEach(val => { sum += val; cumPolarity.push(sum); });
+    const rawVar = variance(cumPolarity);
+
+    // Anti-parallel Mod-6 phase engine modulation
+    let phaseReal = [];
+    for (let i = 0; i < polarity.length; i++) {
+      let angle = (i * Math.PI / 3.0) + (polarity[i] * Math.PI / 2.0);
+      phaseReal.push(Math.cos(angle));
+    }
+
+    let cumPhase = [];
+    let phaseSum = 0;
+    phaseReal.forEach(val => { phaseSum += val; cumPhase.push(phaseSum); });
+    const modVar = variance(cumPhase);
+
+    let ratio = modVar / (rawVar + 1e-6);
+    
+    // Spectral Power Index calculation
+    let spectralPower = (1.0 / (ratio + 0.05)) * (Math.log(N) / Math.log(10));
+
+    let badgeClass = "badge-noise";
+    let classification = "Random Drift / Noise";
+    if (ratio < 0.35) {
+      classification = "Conserved Coding Frame";
+      badgeClass = "badge-strong";
+    } else if (ratio < 0.80) {
+      classification = "Structured Regulatory";
+      badgeClass = "badge-mod";
+    }
+
+    processedRecords.push({
+      id: rec.id,
+      length: N,
+      ratio: ratio,
+      spectralPower: spectralPower,
+      classification: classification,
+      cumPolarity: cumPolarity,
+      cumPhase: cumPhase
+    });
+
+    html += `<tr class="clickable-row" onclick="renderChart(${processedRecords.length - 1}, this)">
+      <td><strong>${rec.id}</strong></td>
+      <td>${N}</td>
+      <td><code>${ratio.toFixed(4)}</code></td>
+      <td><code>${spectralPower.toFixed(2)}</code></td>
+      <td><span class="badge ${badgeClass}">${classification}</span></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+
+  document.getElementById('export-csv-btn').style.display = 'inline-flex';
+  
+  // Automatically display chart for the first sequence
+  if (processedRecords.length > 0) {
+    const firstRow = document.querySelector('#results-table tbody tr');
+    renderChart(0, firstRow);
+  }
+}
+
+function variance(arr) {
+  const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
+  const sqDiffs = arr.map(value => Math.pow(value - mean, 2));
+  return sqDiffs.reduce((a, b) => a + b, 0) / arr.length;
+}
+
+function renderChart(index, rowElement) {
+  const rec = processedRecords[index];
+  if (!rec) return;
+
+  // Highlight table row
+  document.querySelectorAll('#results-table tbody tr').forEach(r => r.classList.remove('selected-row'));
+  if (rowElement) rowElement.classList.add('selected-row');
+
+  document.getElementById('visualizer').style.display = 'block';
+  document.getElementById('chart-title').innerText = `Trajectory: ${rec.id}`;
+  document.getElementById('chart-subtitle').innerText = `Suppression Ratio: ${rec.ratio.toFixed(4)} | Classification: ${rec.classification}`;
+
+  const labels = Array.from({length: rec.length}, (_, i) => i + 1);
+
+  const ctx = document.getElementById('signalChart').getContext('2d');
+
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Raw Polarity Walk (Unmodulated)',
+          data: rec.cumPolarity,
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.05)',
+          borderWidth: 2,
+          pointRadius: 0,
+          tension: 0.1
+        },
+        {
+          label: 'Phase-Engine Walk (UAPIS Suppressed)',
+          data: rec.cumPhase,
+          borderColor: '#0284c7',
+          backgroundColor: 'rgba(2, 132, 199, 0.08)',
+          borderWidth: 2,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Nucleotide Position (bp)' },
+          grid: { display: false }
+        },
+        y: {
+          title: { display: true, text: 'Cumulative Polarity Walk' }
+        }
+      },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { enabled: true }
+      }
+    }
+  });
+}
+
+function downloadChartPNG() {
+  if (!chartInstance) return;
+  const a = document.createElement('a');
+  a.href = chartInstance.toBase64Image();
+  a.download = `UAPIS_Signal_${Date.now()}.png`;
+  a.click();
+}
+
+function exportResultsCSV() {
+  if (!processedRecords.length) return;
+  let csv = "Sequence_ID,Length_bp,Suppression_Ratio,Spectral_Power,Classification\n";
+  processedRecords.forEach(r => {
+    csv += `"${r.id}",${r.length},${r.ratio.toFixed(6)},${r.spectralPower.toFixed(4)},"${r.classification}"\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `UAPIS_Analysis_Export_${Date.now()}.csv`);
+  a.click();
+}
+</script>
+</body>
+</html>
