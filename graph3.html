@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desmos Matrix - Trinary Symmetry Spectral Map</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 950px; margin: 0 auto; padding: 40px 20px; background-color: #f8fafc; }
+        h1 { color: #0284c7; margin-bottom: 8px; font-size: 2.2em; letter-spacing: -0.02em; }
+        p { color: #4b5563; font-size: 1.05em; margin-bottom: 24px; }
+        
+        /* High-fidelity Desmos-style viewport container */
+        .graph-viewport { 
+            position: relative; 
+            width: 100%; 
+            height: 520px; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            background-color: #1e293b; /* Dark mathematical canvas */
+            overflow: auto; /* Activates seamless horizontal and vertical scrolling */
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.4);
+        }
+        
+        /* Extended virtual scrolling canvas layout space */
+        .graph-canvas {
+            width: 2400px; /* Long horizontal scroll canvas to trace prime values */
+            height: 600px;
+            position: relative;
+        }
+
+        /* Fixed HUD Instruction Tag overlay */
+        .instruction-badge {
+            position: sticky;
+            top: 12px;
+            left: 12px;
+            display: inline-block;
+            background: rgba(15, 23, 42, 0.95);
+            color: #f8fafc;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            border: 1px solid #475569;
+            z-index: 10;
+            pointer-events: none;
+            font-family: monospace;
+        }
+
+        .legend-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .legend-item { display: flex; align-items: center; font-size: 0.9em; font-weight: 500; }
+        .legend-color { width: 24px; height: 4px; margin-right: 8px; border-radius: 2px; }
+        .prime-indicator { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+    </style>
+</head>
+<body>
+
+    <h1>Spectral Prime Mapping & Composite Cancellation Grid</h1>
+    <p>
+        Desmos-modeled analytical grid showcasing the 180° anti-parallel cancellation mechanics. Notice how the waves undergo total destructive interference, flattening into dead nodes at <b>Composite Integer Tracks</b>, while constructively focusing into sharp, uninhibited vertical spikes exclusively at <b>Primes (5, 7, 11, 13)</b>.
+    </p>
+
+    <!-- Desmos Container Window -->
+    <div class="graph-viewport">
+        <div class="instruction-badge">
+            &larr; Drag or Scroll Horizontally to Follow the Primes Engine Matrix Sequence &rarr;
+        </div>
+
+        <div class="graph-canvas">
+            <!-- Vector Grid Map (X-width: 2400px, Y-height: 600px) -->
+            <svg width="100%" height="100%" viewBox="0 0 2400 600" xmlns="http://w3.org">
+                
+                <!-- Calibrated Oscilloscope Desmos Grid Pattern Grid -->
+                <defs>
+                    <pattern id="minor-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" stroke-width="0.5"/>
+                    </pattern>
+                    <pattern id="major-grid" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <rect width="100" height="100" fill="url(#minor-grid)"/>
+                        <path d="M 100 0 L 0 0 0 100" fill="none" stroke="#475569" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect x="50" y="50" width="2300" height="450" fill="url(#major-grid)" />
+
+                <!-- AXES STRUCTURAL FRAMEWORKS -->
+                <line x1="50" y1="50" x2="50" y2="500" stroke="#94a3b8" stroke-width="2" />
+                <line x1="50" y1="350" x2="2350" y2="350" stroke="#cbd5e1" stroke-width="2.5" /> <!-- Zero Line (Equilibrium Horizon) -->
+                <line x1="50" y1="500" x2="2350" y2="500" stroke="#94a3b8" stroke-width="1.5" />
+
+                <!-- Y AXIS TICK VALUES (Amplitudes) -->
+                <text x="15" y="104" fill="#64748b" font-size="11" font-family="monospace">+250</text>
+                <text x="15" y="229" fill="#64748b" font-size="11" font-family="monospace">+125</text>
+                <text x="25" y="354" fill="#cbd5e1" font-size="11" font-family="monospace" font-weight="bold">0</text>
+                <text x="15" y="479" fill="#64748b" font-size="11" font-family="monospace">-125</text>
+
+                <!-- VERTICAL REFERENCE TRACK LINES MAPPED TO SPECIFIC INTEGERS (X Steps of 130px) -->
+                <!-- Every integer has its own column path to demonstrate state metrics -->
+                
+                <!-- Track 4 (Composite) -->
+                <line x1="200" y1="50" x2="200" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="195" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">4</text>
+                
+                <!-- Track 5 (PRIME) -->
+                <line x1="330" y1="50" x2="330" y2="500" stroke="#475569" stroke-width="1.5" />
+                <text x="325" y="525" fill="#38bdf8" font-size="14" font-family="monospace" font-weight="bold">5*</text>
+                
+                <!-- Track 6 (Composite Base Modulo) -->
+                <line x1="460" y1="50" x2="460" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="455" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">6</text>
+
+                <!-- Track 7 (PRIME) -->
+                <line x1="590" y1="50" x2="590" y2="500" stroke="#475569" stroke-width="1.5" />
+                <text x="585" y="525" fill="#38bdf8" font-size="14" font-family="monospace" font-weight="bold">7*</text>
+
+                <!-- Track 8 (Composite) -->
+                <line x1="720" y1="50" x2="720" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="715" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">8</text>
+
+                <!-- Track 9 (Composite Echo) -->
+                <line x1="850" y1="50" x2="850" y2="500" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.6"/>
+                <text x="845" y="525" fill="#f87171" font-size="13" font-family="monospace">9</text>
+
+                <!-- Track 10 (Composite) -->
+                <line x1="980" y1="50" x2="980" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="975" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">10</text>
+
+                <!-- Track 11 (PRIME) -->
+                <line x1="1110" y1="50" x2="1110" y2="500" stroke="#475569" stroke-width="1.5" />
+                <text x="1102" y="525" fill="#38bdf8" font-size="14" font-family="monospace" font-weight="bold">11*</text>
+
+                <!-- Track 12 (Composite Modulo) -->
+                <line x1="1240" y1="50" x2="1240" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="1232" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">12</text>
+
+                <!-- Track 13 (PRIME) -->
+                <line x1="1370" y1="50" x2="1370" y2="500" stroke="#475569" stroke-width="1.5" />
+                <text x="1362" y="525" fill="#38bdf8" font-size="14" font-family="monospace" font-weight="bold">13*</text>
+
+                <!-- Track 14 (Composite Track) -->
+                <line x1="1500" y1="50" x2="1500" y2="500" stroke="#334155" stroke-width="1" stroke-dasharray="2,4" />
+                <text x="1492" y="525" fill="#94a3b8" font-size="13" font-family="monospace" font-weight="bold">14</text>
+
+                <!-- Track 15 (Composite Echo) -->
+                <line x1="1630" y1="50" x2="1630" y2="500" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="2,2" opacity="0.6"/>
+                <text x="1622" y="525" fill="#f87171" font-size="13" font-family="monospace">15</text>
+
+
+                <!-- THE TRACK 1 INTERFERENCE WAVE (6k+1 Core Vector Function Pattern) -->
+                <path d="M 50,350 
+                         Q 125,120 200,350 
+                         Q 265,580 330,100 
+                         Q 395,350 460,350 
+                         Q 525,120 590,100 
+                         Q 655,350 720,350
+                         Q 785,350 850,350
+                         Q 915,350 980,350
+                         Q 1045,580 1110,100
+                         Q 1175,350 1240,350
+                         Q 1305,120 1370,100
+                         Q 1435,350 1500,350
+                         Q 1565,350 1630,350" 
+                      fill="none" stroke="#38bdf8" stroke-width="3" />
+
+                <!-- THE TRACK 2 INTERFERENCE WAVE (6k+5 Anti-Parallel Balancing Track Function) -->
+                <path d="M 50,350 
+                         Q 125,580 200,350 
+                         Q 265,120 330,600 
+                         Q 395,350 460,350 
+                         Q 525,580 590,600 
+                         Q 655,350 720,350
+                         Q 785,350 850,350
+                         Q 915,350 980,350
+                         Q 1045,120 1110,600
+                         Q 1175,350 1240,350
+                         Q 1305,580 1370,600

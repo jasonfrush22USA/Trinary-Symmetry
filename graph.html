@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinary Symmetry - Interactive Wave Graph</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 40px 20px; background-color: #f9f9f9; }
+        h1 { color: #0284c7; margin-bottom: 8px; font-size: 2.2em; }
+        p { color: #4b5563; font-size: 1.05em; margin-bottom: 24px; }
+        
+        /* The graph viewport control wrapper */
+        .graph-viewport { 
+            position: relative; 
+            width: 100%; 
+            height: 450px; 
+            border: 2px solid #cbd5e1; 
+            border-radius: 8px; 
+            background-color: #0f172a; /* Deep space dark canvas */
+            overflow: auto; /* Activates native panning/scrolling up, down, left, right */
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* The extended virtual drawing canvas for zooming space */
+        .graph-canvas {
+            width: 1600px; /* Double width to allow rich horizontal panning */
+            height: 800px; /* Tall viewport height to let users move up and down */
+            position: relative;
+        }
+
+        /* Sticky control overlay helper */
+        .instruction-badge {
+            position: sticky;
+            top: 12px;
+            left: 12px;
+            display: inline-block;
+            background: rgba(15, 23, 42, 0.85);
+            color: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            border: 1px solid #334155;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .legend-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .legend-item { display: flex; align-items: center; font-size: 0.9em; font-weight: 500; }
+        .legend-color { width: 24px; height: 4px; margin-right: 8px; border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+    <h1>Wave Function Dynamics & Boundary Slopes</h1>
+    <p>
+        Visual representation of the modulo-6 anti-parallel cancellation engine tracks operating within the universal geometric divisor bounds. Drag, scroll, or use the scrollbars to pan up, down, left, or right across the continuous scale.
+    </p>
+
+    <!-- Interactive Graph Container Window -->
+    <div class="graph-viewport">
+        <!-- Floating HUD Instruction Box -->
+        <div class="instruction-badge">
+            &larr; Pan Grid Up/Down/Left/Right &rarr;
+        </div>
+
+        <div class="graph-canvas">
+            <!-- Native Vector SVG Graph Matrix -->
+            <svg width="100%" height="100%" viewBox="0 0 1600 800" xmlns="http://w3.org">
+                
+                <!-- Background Grid Coordinates (Centering Axis at Y=400) -->
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+
+                <!-- Central Equilibrium Horizon Axis line (σ = 1/2) -->
+                <line x1="0" y1="400" x2="1600" y2="400" stroke="#475569" stroke-width="2" stroke-dasharray="4,4" />
+                <text x="20" y="390" fill="#94a3b8" font-size="12" font-family="monospace">Global Equilibrium Axis (σ = 1/2)</text>
+
+                <!-- 1. UPPER BOUND SLOPE (Universal Geometric Divisor Model) -->
+                <!-- Equation modeled as an asymptotic ceiling envelope decaying to equilibrium -->
+                <path d="M 0,100 C 400,220 800,320 1600,380" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5" />
+                <text x="1400" y="365" fill="#ef4444" font-size="12" font-family="monospace">Upper Bound Ceiling</text>
+
+                <!-- 2. LOWER BOUND SLOPE -->
+                <!-- Symmetric floor reflection mapping baseline thresholds -->
+                <path d="M 0,700 C 400,580 800,480 1600,420" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="5,5" />
+                <text x="1400" y="445" fill="#10b981" font-size="12" font-family="monospace">Lower Bound Floor</text>
+
+                <!-- 3. TRACK 1 WAVE FUNCTION (Modulo-6 Sequence Phase +1) -->
+                <!-- High-frequency vector path modeling constructive alignment peaks -->
+                <path d="M 0,400 
+                         C 100,200 150,220 200,400 
+                         C 250,580 300,550 400,400 
+                         C 500,250 550,260 600,400 
+                         C 650,520 700,500 800,400
+                         C 900,300 950,310 1000,400
+                         C 1050,480 1100,470 1200,400
+                         C 1300,340 1350,350 1400,400
+                         C 1450,450 1500,440 1600,400" 
+                      fill="none" stroke="#38bdf8" stroke-width="3" />
+
+                <!-- 4. TRACK 2 WAVE FUNCTION (Modulo-6 Sequence Phase -1) -->
+                <!-- Symmetrically inverted anti-parallel destructive phase match track -->
+                <path d="M 0,400 
+                         C 100,600 150,580 200,400 
+                         C 250,220 300,250 400,400 
+                         C 500,550 550,540 600,400 
+                         C 650,280 700,300 800,400
+                         C 900,500 950,490 1000,400
+                         C 1050,320 1100,330 1200,400
+                         C 1300,460 1350,450 1400,400
+                         C 1450,350 1500,360 1600,400" 
+                      fill="none" stroke="#f59e0b" stroke-width="2.5" opacity="0.85" />
+                
+                <!-- Destructive Interference Point Targets -->
+                <circle cx="200" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="400" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="600" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="800" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="1000" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="1200" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                <circle cx="1400" cy="400" r="6" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
+                
+            </svg>
+        </div>
+    </div>
+
+    <!-- Graphical Descriptive Legend Block -->
+    <div class="legend-box">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #ef4444; border-bottom: 2px dashed #ef4444;"></div>
+            <span>Upper Bound Envelope</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #10b981; border-bottom: 2px dashed #10b981;"></div>
+            <span>Lower Bound Envelope</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #38bdf8;"></div>
+            <span>Track 1 Phase Wave (6k+1)</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #f59e0b;"></div>
+            <span>Track 2 Phase Wave (6k+5)</span>
+        </div>
+    </div>
+
+</body>
+</html>
