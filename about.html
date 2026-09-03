@@ -5,103 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - The Trinary Symmetry Project</title>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #38bdf8;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 3rem 1.5rem;
         }
+
+        nav {
+            margin-bottom: 2rem;
+        }
+
+        nav a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
         h1 {
-            border-bottom: 2px solid #eee;
-            padding-bottom: 10px;
-            color: #111;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 0.5rem;
         }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        section {
+            margin-bottom: 3rem;
+        }
+
         h2 {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-            color: #222;
-            margin-top: 30px;
+            font-size: 1.6rem;
+            color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            margin-top: 2rem;
         }
-        ul {
-            padding-left: 20px;
+
+        h3 {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            margin-top: 1.5rem;
         }
-        li {
-            margin-bottom: 8px;
-        }
-        .equation {
-            background-color: #f8f9fa;
-            border-left: 4px solid #0066cc;
-            padding: 12px;
-            font-family: "Courier New", Courier, monospace;
-            margin: 15px 0;
+
+        .math-block {
+            background-color: #090d16;
+            padding: 1.25rem;
+            border-radius: 6px;
+            font-family: "Georgia", "Times New Roman", serif;
+            text-align: center;
+            font-size: 1.15rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border-color);
             overflow-x: auto;
         }
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 0.9em;
+
+        ul {
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .ai-section {
+            background-color: var(--card-bg);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 8px 8px 0;
+            padding: 1.75rem;
         }
     </style>
 </head>
 <body>
 
-    <h1>About the Trinary Symmetry Project</h1>
-    <p>The Trinary Symmetry Project is an open-science research initiative dedicated to accelerating global data processing, digital signal analysis, and computational genomics. Founded on a rigorous operator-theoretic and spectral mapping framework, our mission is to eliminate computational bottlenecks at the sensor level, making high-throughput data analysis faster, universally accessible, and drastically lower in power consumption.</p>
+<div class="container">
+  
 
-    <h2>The Mathematical Innovation</h2>
-    <p>The framework anchors deterministic modulo-6 arithmetic channels (6k + 1 and 6k + 5) onto a strict 180-degree anti-parallel phase engine (e^(i · π · (x - 1) / 4)). Combined with a bounded complex trinary phase clock (e^(i · 2 · π · x / 3)), this phase-rotated Dirichlet series drives destructive interference over composite coordinates, forcing a 98.08% reduction in structural background noise. Furthermore, using an infinite-dimensional self-adjoint Hamiltonian operator system (Ĥ_infinity = -i · ℏ · [x · (d/dx) + 1/2]) over an Adelic multi-prime network, the model demonstrates how anti-parallel trajectories mirror the classic Riemann critical line (σ = 1/2).</p>
-    
-    <p>Traditional signal filtering frameworks often struggle to distinguish structural signal variants from non-stationary background noise without high operational overhead. The Trinary Symmetry Framework resolves this challenge by introducing a bounded modulo-6 anti-parallel phase engine acting over trace-class functional domains.</p>
+    <header>
+        <h1>About The Trinary Symmetry Project</h1>
+        <div class="subtitle">Research Scope, Operator Theory, and Computational Verification</div>
+    </header>
 
-    <p>By mapping data streams into a binary polarity array P_i ∈ {-1.0, +1.0} and enforcing a strict 180-degree anti-parallel phase alignment using the complex exponential operator A(x) = e^(i · π · ((x - 1) / 4)), unstructured background noise undergoes immediate destructive wave interference. Signal coherence is continually monitored via a real-time variance suppression ratio:</p>
-    
-    <div class="equation">
-        R = Variance(W_phase) / (Variance(W_raw) + ε)
-    </div>
+    <main>
+        <section>
+            <h2>Project Overview</h2>
+            <p>
+                The Trinary Symmetry Project is an open-science initiative centered on the mathematical formulation of an operator-theoretic spectral mapping framework. The primary focus of the project is to explore how deterministic arithmetic structures, anti-parallel phase mechanics, and trinary clock mappings interact to systematically isolate signal structure from non-stationary background noise.
+            </p>
+            <p>
+                By shifting the paradigm from statistical noise estimation to operator-level phase cancellation, the project provides a deterministic foundation for harmonic analysis, signal isolation, and operator stability across complex boundary domains.
+            </p>
+        </section>
 
-    <p>When the metric indicates highly conserved structural alignment (R &lt; 0.35), the system isolates the data for downstream applications. When the metric reflects random noise (R ≥ 0.85), the data payload is immediately dropped, preventing uninformative data from overloading remote servers or cloud databases.</p>
+        <section>
+            <h2>The Mathematical Framework &amp; Conditional Proof</h2>
+            <p>
+                The mathematical core of the project relies on anchoring deterministic modulo-6 arithmetic channels (<i>6k + 1</i> and <i>6k + 5</i>) to a strict 180&deg; anti-parallel phase engine:
+            </p>
+            <div class="math-block">
+                <i>A(x)</i> = <i>e</i><sup><i>i</i> &middot; &pi; &middot; (<i>x</i> - 1) / 4</sup>
+            </div>
+            <p>
+                When paired with a bounded complex trinary phase clock, <i>C(x)</i> = <i>e</i><sup><i>i</i> &middot; 2 &middot; &pi; &middot; <i>x</i> / 3</sup>, this phase-rotated Dirichlet series forces destructive interference across composite coordinates, suppressing background noise and leaving a precise residual functional payload.
+            </p>
+            
+            <h3>Adelic Multi-Prime Network &amp; Hamiltonian Operator</h3>
+            <p>
+                Rather than asserting a closed, classical proof, the project presents a formal <b>conditional proof draft</b>. Constructed over an Adelic multi-prime network, the framework introduces an infinite-dimensional self-adjoint Hamiltonian operator system:
+            </p>
+            <div class="math-block">
+                <i>&Hat;H</i><sub>&infin;</sub> = &minus;<i>i</i> &middot; &#x210F; &middot; [ <i>x</i> &middot; (<i>d</i> / <i>dx</i>) + &frac12; ]
+            </div>
+            <p>
+                Under this formulation, anti-parallel trajectory pairs mirror the classic Riemann critical line (<i>&sigma;</i> = &frac12;). This conditional framework serves as an open research infrastructure to encourage stress-testing, boundary verification, and formal peer analysis within the global mathematical community.
+            </p>
+        </section>
 
-    <p>Rather than asserting a closed classical proof, this project serves as an open research infrastructure to invite academic collaboration, computational stress-testing, and joint refinement.</p>
-
-    <h2>Real-World Implementations</h2>
-    <p>Our open-source framework is designed for cross-industry deployment across software and hardware manifestations:</p>
-    <ul>
-        <li><strong>Client-Side Web Triage:</strong> In-browser JavaScript threads (HTML5 Web Workers) for local, ultra-low-latency genomic sequence pre-filtering (FASTA/FASTQ) prior to cloud alignment.</li>
-        <li><strong>Integrated Photonic Co-Processors:</strong> Mach-Zehnder Interferometer (MZI) arrays etched on semiconductor substrates (such as Lithium Niobate or Silicon-on-Insulator matrices) executing phase transformations at speed-of-light latencies.</li>
-        <li><strong>Analog RF Signal Filters:</strong> Waveguides leveraging fixed 180-degree phase-inversion delay lines to isolate narrow-band anomalies from ambient plasma dispersion or thermal noise.</li>
-        <li><strong>Digital Hardware Accelerators:</strong> High-performance ASIC or FPGA logic cores utilizing parallel Arithmetic Logic Unit (ALU) accumulators and pre-loaded lookup tables to completely eliminate floating-point multiplication overhead.</li>
-    </ul>
-
-    <h2>Our Open Patent Pledge & Ethical Standard</h2>
-    <p>We believe that foundational mathematical and scientific breakthroughs belong to humankind. To ensure that our research remains a permanently accessible utility for global scientific advancement, we have taken a unique, defensive approach to intellectual property.</p>
-    
-    <p>The Trinary Symmetry Framework is officially protected by U.S. Provisional Patent Application Serial No. [Insert Serial Number From Receipt]. Alongside this filing, the project has issued a perpetual, worldwide, royalty-free <strong>Open Patent Pledge</strong>.</p>
-    
-    <p>We pledge never to bring any patent infringement lawsuits against any academic institution, university researcher, open-source developer, or non-commercial entity utilizing this architecture for open research. This pledge is legally binding on the Inventor and any future assignees of this intellectual property, ensuring that this foundational mathematical framework remains a permanently accessible utility for the global scientific community.</p>
-    
-    <p>While non-commercial research, academic exploration, and open-source developments are completely royalty-free under our pledge, commercial implementations of the Trinary Symmetry Framework within proprietary software, enterprise systems, or commercial hardware require a standard commercial license. 100% of the proceeds generated from these commercial licensing agreements are legally restricted and funneled back into the scientific ecosystem. These funds are used exclusively to sponsor independent mathematical research, establish open-access academic grants, and fund computational fellowships to support the next generation of researchers solving grand challenges in mathematics and complexity theory.</p>
-    
-    <p>Our patent exists solely as a shield to prevent predatory commercial entities from privatizing this math and locking out the global scientific community.</p>
-
-    <h2>AI Utilization & Computational Verification</h2>
-    <p>This project was developed under human research leadership utilizing advanced Artificial Intelligence as a secondary technical tool. Google's Gemini was deployed extensively under the direct prompt parameters and supervision of the principal investigator to execute complex simulations, format technical prose, and verify numerical bounds:</p>
-    <ul>
-        <li><strong>Mathematical Verification & Multi-Variable Scans:</strong> Executed high-precision calculations, evaluated predefined boundary metrics, and validated tensor grid scanning logic for high-frequency τ domains under human oversight.</li>
-        <li><strong>Structural Review & Computational Stress-Testing:</strong> Tested functional analysis pathways, calculated operator self-adjointness constraints over non-local boundary domains, and verified global functional reflection symmetries based on human-conceived parameters.</li>
-        <li><strong>Technical Appendix Formalization:</strong> Assisted in the structural formatting, prose organization, and verification of the technical appendix layout, confirming trace-class operator convergence, spectral duality, multi-prime orthogonality, Selberg trace isomorphisms, and Diophantine phase-lock stability.</li>
-    </ul>
-
-    <div class="footer">
-        <h3>💻 Open Source Repository & Contact</h3>
-        <ul>
-            <li><strong>Source Code & Hardware Layouts:</strong> <a href="#">[Link to your GitHub Repository]</a></li>
-            <li><strong>Research Manuscript:</strong> <a href="#">[Link to your arXiv Preprint or PDF Document]</a></li>
-            <li><strong>Principal Investigator:</strong> Jason Frush — [Insert Project Email Address]</li>
-        </ul>
-    </div>
+        <section class="ai-section">
+            <h2>AI Utilization &amp; Computational Verification</h2>
+            <p>
+                This project was developed under human research leadership utilizing advanced Artificial Intelligence as a secondary technical tool. Google's Gemini was deployed extensively under the direct prompt parameters and supervision of the principal investigator to execute complex simulations, format technical prose, and verify numerical bounds:
+            </p>
+            <ul>
+                <li>
+                    <b>Mathematical Verification &amp; Multi-Variable Scans:</b> Executed high-precision calculations, evaluated predefined boundary metrics, and validated tensor grid scanning logic for high-frequency <i>&tau;</i> domains under human oversight.
+                </li>
+                <li>
+                    <b>Structural Review &amp; Computational Stress-Testing:</b> Tested functional analysis pathways, calculated operator self-adjointness constraints over non-local boundary domains, and verified global functional reflection symmetries based on human-conceived parameters.
+                </li>
+                <li>
+                    <b>Technical Appendix Formalization:</b> Assisted in the structural formatting, prose organization, and verification of the technical appendix layout, confirming trace-class operator convergence, spectral duality, multi-prime orthogonality, Selberg trace isomorphisms, and Diophantine phase-lock stability.
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
 
 </body>
 </html>
