@@ -359,65 +359,65 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         function processFRBFile() {
     const fileInput = document.getElementById('frb-file-input');
     if (!fileInput.files.length) {
-        alert('Please select a valid FRB data file first.');
+        alert('Please select a .fil file first.');
         return;
     }
     const file = fileInput.files[0];
     const reader = new FileReader();
 
-    if (file.name.endsWith('.fil')) {
+    if (file.name.toLowerCase().endsWith('.fil')) {
         reader.onload = function(e) {
             try {
                 const buffer = e.target.result;
-                const uint8View = new Uint8Array(buffer);
+                const bytes = new Uint8Array(buffer);
                 
-                // 1. Locate end of Sigproc binary header ("HEADER_END")
-                let headerEndIndex = 0;
-                const headerEndStr = "HEADER_END";
-                for (let i = 0; i < uint8View.length - headerEndStr.length; i++) {
+                // 1. Safe Header Parsing: Search for "HEADER_END" or skip first 1024 bytes
+                let dataStart = 1024; // Fallback Sigproc header size
+                const marker = "HEADER_END";
+                for (let i = 0; i < Math.min(bytes.length - marker.length, 4096); i++) {
                     let match = true;
-                    for (let j = 0; j < headerEndStr.length; j++) {
-                        if (uint8View[i + j] !== headerEndStr.charCodeAt(j)) {
-                            match = false;
-                            break;
-                        }
+                    for (let j = 0; j < marker.length; j++) {
+                        if (bytes[i + j] !== marker.charCodeAt(j)) { match = false; break; }
                     }
-                    if (match) {
-                        headerEndIndex = i + headerEndStr.length;
-                        break;
-                    }
+                    if (match) { dataStart = i + marker.length; break; }
                 }
 
-                // 2. Read numerical Float32 data starting AFTER the header
-                const dataBuffer = buffer.slice(headerEndIndex);
-                const floatData = new Float32Array(dataBuffer);
+                // 2. Extract Data Portion
+                const rawBuffer = buffer.slice(dataStart);
+                const floatView = new Float32Array(rawBuffer);
                 
-                // 3. Extract valid finite floats and downsample for the canvas
-                const validFloats = [];
-                const step = Math.max(1, Math.floor(floatData.length / 160));
-                
-                for (let i = 0; i < floatData.length; i += step) {
-                    const val = floatData[i];
-                    if (!isNaN(val) && isFinite(val) && val !== 0) {
-                        validFloats.push(Math.abs(val));
-                    }
-                }
-
-                if (validFloats.length === 0) {
-                    alert("Could not extract valid pulse data from this .fil file. Try converting to .json with Python.");
+                if (floatView.length === 0) {
+                    alert("Error: File contains no numerical payload past the header.");
                     return;
                 }
 
-                // 4. Normalize profile scale (0 to 50)
-                const max = Math.max(...validFloats);
-                const min = Math.min(...validFloats);
-                const normProfile = validFloats.map(v => ((v - min) / (max - min + 1e-6)) * 50.0);
+                // 3. Filter out NaNs / Infs and collapse down into 160 time bins for Canvas
+                const cleanFloats = [];
+                const stride = Math.max(1, Math.floor(floatView.length / 160));
+                
+                for (let i = 0; i < floatView.length; i += stride) {
+                    const val = floatView[i];
+                    if (Number.isFinite(val) && val !== 0) {
+                        cleanFloats.push(Math.abs(val));
+                    }
+                }
 
-                // 5. Run Mod-6 Phase Filter & Render Canvas
+                if (cleanFloats.length === 0) {
+                    alert("Error: Data array contained non-numeric (NaN/Inf) values. The file format may be 8-bit uint or 16-bit int instead of 32-bit float.");
+                    return;
+                }
+
+                // 4. Normalize (0 to 50 scale)
+                const maxVal = Math.max(...cleanFloats);
+                const minVal = Math.min(...cleanFloats);
+                const range = (maxVal - minVal) || 1.0;
+                const normProfile = cleanFloats.map(v => ((v - minVal) / range) * 50.0);
+
+                // 5. Apply Mod-6 Engine & Render
                 const filtered = applyMod6Filter(normProfile);
                 renderProfilesOnCanvas(normProfile, filtered);
 
-                // 6. Update UI Metrics
+                // Update Metrics UI
                 const rawVar = calculateVariance(normProfile);
                 const filtVar = calculateVariance(filtered);
                 const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
@@ -427,17 +427,21 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
 
                 document.getElementById('output-container').innerHTML = 
-                    '<h3>Loaded Binary Filterbank File: ' + file.name + '</h3>' +
-                    '<p>Header skipped successfully. Parsed ' + validFloats.length + ' pulse time-bins into canvas renderer.</p>';
+                    '<h3>Binary Filterbank Loaded</h3>' +
+                    '<p>Processed ' + cleanFloats.length + ' downsampled time-bins directly on Canvas.</p>';
 
             } catch (err) {
-                console.error(err);
-                alert("Error processing .fil file: " + err.message);
+                alert("JavaScript Execution Error: " + err.message);
             }
         };
+        
+        reader.onerror = function() {
+            alert("File Loading Error: Could not read file from disk.");
+        };
+
         reader.readAsArrayBuffer(file);
     } else {
-        // Standard Text / JSON / CSV reader
+        // Fallback for CSV / JSON text formats
         reader.onload = function(e) {
             if (file.name.endsWith('.json')) {
                 const profileData = JSON.parse(e.target.result);
@@ -450,6 +454,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         reader.readAsText(file);
     }
 }
+
 
 }
 
