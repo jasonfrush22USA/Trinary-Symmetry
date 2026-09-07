@@ -357,23 +357,67 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         }
 
         function processFRBFile() {
-            const fileInput = document.getElementById('frb-file-input');
-            if (!fileInput.files.length) {
-                alert('Please select a valid FRB data file first.');
-                return;
-            }
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                if (file.name.endsWith('.json')) {
-                    const profileData = JSON.parse(e.target.result);
-                    renderProfilesOnCanvas(profileData, applyMod6Filter(profileData));
-                } else {
-                    parseAndAnalyzeFRBs(e.target.result, file.name);
+    const fileInput = document.getElementById('frb-file-input');
+    if (!fileInput.files.length) {
+        alert('Please select a valid FRB data file first.');
+        return;
+    }
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    // Check if the user selected a binary .fil file
+    if (file.name.endsWith('.fil')) {
+        reader.onload = function(e) {
+            const buffer = e.target.result;
+            const floatData = new Float32Array(buffer);
+            
+            // Extract numerical values from binary array (downsampling to fit canvas)
+            const rawProfile = [];
+            const step = Math.max(1, Math.floor(floatData.length / 160));
+            
+            for (let i = 0; i < floatData.length; i += step) {
+                if (!isNaN(floatData[i]) && isFinite(floatData[i])) {
+                    rawProfile.push(Math.abs(floatData[i]));
                 }
-            };
-            reader.readAsText(file);
-        }
+            }
+            
+            // Normalize and render on canvas
+            const max = Math.max(...rawProfile);
+            const min = Math.min(...rawProfile);
+            const normProfile = rawProfile.map(v => ((v - min) / (max - min + 1e-6)) * 50.0);
+            
+            const filtered = applyMod6Filter(normProfile);
+            renderProfilesOnCanvas(normProfile, filtered);
+            
+            // Calculate variance suppression metric
+            const rawVar = calculateVariance(normProfile);
+            const filtVar = calculateVariance(filtered);
+            const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
+
+            document.getElementById('metrics-container').innerHTML = 
+                '<div class="metrics-badge">Loaded Binary Filterbank: ' + file.name + '</div>' +
+                '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
+
+            document.getElementById('output-container').innerHTML = 
+                '<h3>Loaded Binary Filterbank File: ' + file.name + '</h3>' +
+                '<p>Parsed binary floating-point values directly in browser array buffer.</p>';
+        };
+        reader.readAsArrayBuffer(file); // Read as binary buffer instead of text
+    } else {
+        // Standard Text / JSON / CSV reader
+        reader.onload = function(e) {
+            if (file.name.endsWith('.json')) {
+                const profileData = JSON.parse(e.target.result);
+                const filtered = applyMod6Filter(profileData);
+                renderProfilesOnCanvas(profileData, filtered);
+            } else {
+                parseAndAnalyzeFRBs(e.target.result, file.name);
+            }
+        };
+        reader.readAsText(file);
+    }
+}
+
 
         function parseAndAnalyzeFRBs(text, sourceLabel) {
             const container = document.getElementById('output-container');
