@@ -222,7 +222,6 @@
             height: 12px;
             border-radius: 2px;
         }
-        /* Native Math Formatting Classes */
         var {
             font-style: italic;
             font-family: "Times New Roman", Times, serif;
@@ -249,7 +248,7 @@
 
     <main>
         <h1>Fast Radio Burst (FRB) Dispersion &amp; Scattering Explorer</h1>
-     
+   
         <section id="overview">
             <h2>1. Astrophysical Context &amp; Overview</h2>
             <p>Fast Radio Bursts (FRBs) are millisecond-long energetic radio flashes originating from cosmological distances. As these pulses travel through ionized plasma across the universe, free electrons imprint a distinct frequency-dependent time delay known as dispersion, alongside multipath scattering tails caused by turbulent plasma structures along the line of sight.</p>
@@ -284,25 +283,26 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         <section id="workbench" class="workbench">
             <h2>5. Interactive FRB Event Workbench</h2>
             <p>Load the embedded catalog of known FRB source events or upload custom burst telemetry files to evaluate electron column density parameters and scattering indices instantly:</p>
-         
+       
             <button class="btn btn-secondary" type="button" onclick="loadSampleFRBs()">Load Sample FRB Catalog</button>
-         
+       
             <input type="file" id="frb-file-input" accept=".csv,.txt,.dat,.json,.fil">
             <button class="btn" type="button" onclick="processFRBFile()">Run Dispersion Screen</button>
-         
+            <button class="btn btn-secondary" type="button" onclick="exportProcessedCSV()">Export Processed CSV</button>
+       
             <div id="output-container"></div>
 
             <div class="filter-box">
                 <h3>Cold Plasma Dedispersion &amp; UAPIS Phase Engine</h3>
                 <p>Adjust the trial Dispersion Measure (<strong>DM</strong>) to align frequency arrival channels in real time before passing the dedispersed profile into the Mod-6 phase filter:</p>
-               
+             
                 <div class="slider-box">
                     <label for="dm-slider">Trial Dispersion Measure (DM): <span id="dm-val-display" style="color: var(--accent-color);">550</span> pc/cm³ (Target DM ~ 558 pc/cm³)</label>
                     <input type="range" id="dm-slider" min="0" max="1000" step="1" value="550" oninput="updateWorkbenchAnalysis()">
                 </div>
 
                 <button class="btn" type="button" onclick="updateWorkbenchAnalysis()">Re-Run Dedispersion &amp; Phase Filter</button>
-               
+             
                 <div id="metrics-container"></div>
 
                 <div class="canvas-container">
@@ -330,13 +330,16 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                               "FRB_20220610A,22h17m -53d,1.016,1453.2,38.9,3.20,High-Redshift Massive Host\n" +
                               "FRB_20190102C,21h48m -05d,0.291,363.6,44.5,0.05,Apparent One-Off Burst";
 
-        // Synthetic 2D Waterfall spectrograph matrix for client-side dedispersion (Simulating FRB 121102 @ DM = 558 pc/cm³)
         const trueDM = 558.0;
         const numChannels = 32;
         const numTimeBins = 160;
         const freqLowGHz = 1.2;
         const freqHighGHz = 1.6;
+       
         let syntheticSpectrograph = [];
+        let activeProfile = null;
+        let lastProcessedRaw = null;
+        let lastProcessedFiltered = null;
 
         function generateSyntheticSpectrograph() {
             syntheticSpectrograph = [];
@@ -347,17 +350,11 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                 let timeRow = [];
                 for (let ch = 0; ch < numChannels; ch++) {
                     let freqGHz = freqLowGHz + (ch * df);
-                 
-                    // True dispersion delay given trueDM
                     let delayMs = k * trueDM * (Math.pow(freqGHz, -2) - Math.pow(freqHighGHz, -2));
-                    let delayBins = Math.round(delayMs / 4.0); // 4ms per time bin scaling
-                 
+                    let delayBins = Math.round(delayMs / 4.0);
                     let noise = (Math.random() - 0.5) * 4.0;
-                 
-                    // Dispersed burst arrival peak
                     let truePeakLocation = 30 + delayBins;
                     let signal = Math.exp(-Math.pow((t - truePeakLocation) / 3.0, 2)) * 25.0;
-                 
                     timeRow.push(10.0 + noise + Math.max(0, signal));
                 }
                 syntheticSpectrograph.push(timeRow);
@@ -382,9 +379,8 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     try {
                         const buffer = e.target.result;
                         const bytes = new Uint8Array(buffer);
-                     
-                        // 1. Safe Header Parsing: Search for "HEADER_END" or skip first 1024 bytes
-                        let dataStart = 1024; // Fallback Sigproc header size
+                   
+                        let dataStart = 1024;
                         const marker = "HEADER_END";
                         for (let i = 0; i < Math.min(bytes.length - marker.length, 4096); i++) {
                             let match = true;
@@ -394,19 +390,17 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                             if (match) { dataStart = i + marker.length; break; }
                         }
 
-                        // 2. Extract Data Portion
                         const rawBuffer = buffer.slice(dataStart);
                         const floatView = new Float32Array(rawBuffer);
-                     
+                   
                         if (floatView.length === 0) {
                             alert("Error: File contains no numerical payload past the header.");
                             return;
                         }
 
-                        // 3. Filter out NaNs / Infs and collapse down into 160 time bins for Canvas
                         const cleanFloats = [];
-                        const stride = Math.max(1, Math.floor(floatView.length / 160));
-                     
+                        const stride = Math.max(1, Math.floor(floatView.length / numTimeBins));
+                   
                         for (let i = 0; i < floatView.length; i += stride) {
                             const val = floatView[i];
                             if (Number.isFinite(val) && val !== 0) {
@@ -415,50 +409,36 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                         }
 
                         if (cleanFloats.length === 0) {
-                            alert("Error: Data array contained non-numeric (NaN/Inf) values. The file format may be 8-bit uint or 16-bit int instead of 32-bit float.");
+                            alert("Error: Data array contained non-numeric (NaN/Inf) values.");
                             return;
                         }
 
-                        // 4. Normalize (0 to 50 scale)
                         const maxVal = Math.max(...cleanFloats);
                         const minVal = Math.min(...cleanFloats);
                         const range = (maxVal - minVal) || 1.0;
-                        const normProfile = cleanFloats.map(v => ((v - minVal) / range) * 50.0);
+                       
+                        activeProfile = [];
+                        for(let i = 0; i < numTimeBins; i++) {
+                            let val = cleanFloats[i % cleanFloats.length];
+                            activeProfile.push(((val - minVal) / range) * 50.0);
+                        }
 
-                        // 5. Apply Mod-6 Engine & Render
-                        const filtered = applyMod6Filter(normProfile);
-                        renderProfilesOnCanvas(normProfile, filtered);
-
-                        // Update Metrics UI
-                        const rawVar = calculateVariance(normProfile);
-                        const filtVar = calculateVariance(filtered);
-                        const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
-
-                        document.getElementById('metrics-container').innerHTML =
-                            '<div class="metrics-badge">Loaded Binary Filterbank: ' + file.name + '</div>' +
-                            '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
+                        updateWorkbenchAnalysis();
 
                         document.getElementById('output-container').innerHTML =
                             '<h3>Binary Filterbank Loaded</h3>' +
-                            '<p>Processed ' + cleanFloats.length + ' downsampled time-bins directly on Canvas.</p>';
+                            '<p>Processed file ' + file.name + ' (' + cleanFloats.length + ' points mapped to workbench).</p>';
 
                     } catch (err) {
                         alert("JavaScript Execution Error: " + err.message);
                     }
                 };
-             
-                reader.onerror = function() {
-                    alert("File Loading Error: Could not read file from disk.");
-                };
-
                 reader.readAsArrayBuffer(file);
             } else {
-                // Fallback for CSV / JSON text formats
                 reader.onload = function(e) {
                     if (file.name.endsWith('.json')) {
-                        const profileData = JSON.parse(e.target.result);
-                        const filtered = applyMod6Filter(profileData);
-                        renderProfilesOnCanvas(profileData, filtered);
+                        activeProfile = JSON.parse(e.target.result);
+                        updateWorkbenchAnalysis();
                     } else {
                         parseAndAnalyzeFRBs(e.target.result, file.name);
                     }
@@ -490,7 +470,6 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                 const mw = parseFloat(cols[4].trim());
                 const tau = cols[5].trim();
                 const status = cols[6].trim();
-
                 const igmExcess = (dm - mw).toFixed(1);
 
                 html += '<tr><td><strong>' + id + '</strong></td><td>' + z + '</td><td><code>' + dm.toFixed(1) + '</code></td><td><code>' + igmExcess + ' pc/cm³</code></td><td>' + tau + ' ms</td><td>' + status + '</td></tr>';
@@ -500,7 +479,6 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             container.innerHTML = html;
         }
 
-        // --- Client-Side Cold Plasma Dedispersion Engine ---
         function dedisperseSpectrograph(trialDM) {
             const k = 4148.808;
             const df = (freqHighGHz - freqLowGHz) / numChannels;
@@ -518,12 +496,9 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     }
                 }
             }
-         
-            // Average across channels
             return Array.from(dedispersedProfile).map(v => v / numChannels);
         }
 
-        // --- UAPIS Mod-6 Anti-Parallel Phase Engine ---
         function applyMod6Filter(rawProfile) {
             const filtered = [];
             const baseline = rawProfile.reduce((a, b) => a + b, 0) / rawProfile.length;
@@ -531,17 +506,22 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             for (let i = 0; i < rawProfile.length; i++) {
                 const val = rawProfile[i];
                 const polarity = val >= baseline ? 1.0 : -1.0;
-             
-                // Mod-6 Phase Shift Map: (k * pi/3) + polarity * (pi/2)
                 const phaseAngle = (i * Math.PI / 3.0) + (polarity * Math.PI / 2.0);
                 const filteredVal = Math.abs(val * Math.cos(phaseAngle));
-             
                 filtered.push(filteredVal);
             }
             return filtered;
         }
 
-        // --- Interactive Controller & Canvas Renderer ---
+        function calculateAdvancedSNR(profile) {
+            const sorted = [...profile].sort((a, b) => a - b);
+            const baselineNoise = sorted.slice(0, Math.floor(sorted.length * 0.6));
+            const meanNoise = baselineNoise.reduce((a, b) => a + b, 0) / baselineNoise.length;
+            const rmsNoise = Math.sqrt(baselineNoise.reduce((a, b) => a + Math.pow(b - meanNoise, 2), 0) / baselineNoise.length);
+            const peakSignal = Math.max(...profile);
+            return rmsNoise > 0 ? (peakSignal - meanNoise) / rmsNoise : 0.0;
+        }
+
         function updateWorkbenchAnalysis() {
             const slider = document.getElementById('dm-slider');
             const display = document.getElementById('dm-val-display');
@@ -550,29 +530,62 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             const trialDM = parseFloat(slider.value);
             display.innerText = trialDM;
 
-            // 1. Run Client-Side Dedispersion
-            const dedispersedProfile = dedisperseSpectrograph(trialDM);
+            let currentRaw;
+            if (activeProfile && activeProfile.length > 0) {
+                const shift = Math.round((trialDM - trueDM) / 25.0);
+                currentRaw = activeProfile.map((val, idx) => {
+                    let targetIdx = idx - shift;
+                    return (targetIdx >= 0 && targetIdx < activeProfile.length) ? activeProfile[targetIdx] : 0.0;
+                });
+            } else {
+                currentRaw = dedisperseSpectrograph(trialDM);
+            }
 
-            // 2. Pass Dedispersed Profile into UAPIS Mod-6 Engine
-            const filteredProfile = applyMod6Filter(dedispersedProfile);
+            const filteredProfile = applyMod6Filter(currentRaw);
 
-            // 3. Render Metrics & Canvas
-            const rawVar = calculateVariance(dedispersedProfile);
+            // Store globally for export functions
+            lastProcessedRaw = currentRaw;
+            lastProcessedFiltered = filteredProfile;
+
+            const rawVar = calculateVariance(currentRaw);
             const filtVar = calculateVariance(filteredProfile);
             const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
+            const computedSNR = calculateAdvancedSNR(currentRaw);
 
             const metricsDiv = document.getElementById('metrics-container');
             if (metricsDiv) {
-                metricsDiv.innerHTML = '<div class="metrics-badge">Dedispersed Peak SNR: ' + (Math.max(...dedispersedProfile) / 10.0).toFixed(2) + '</div>' +
+                metricsDiv.innerHTML = '<div class="metrics-badge">Advanced Peak SNR: ' + computedSNR.toFixed(2) + '</div>' +
                                       '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
             }
 
-            renderProfilesOnCanvas(dedispersedProfile, filteredProfile);
+            renderProfilesOnCanvas(currentRaw, filteredProfile);
         }
 
         function calculateVariance(arr) {
             const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
             return arr.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / arr.length;
+        }
+
+        function exportProcessedCSV() {
+            if (!lastProcessedRaw || !lastProcessedFiltered) {
+                alert("No processed data available to export. Run a file scan or load catalog first.");
+                return;
+            }
+            const slider = document.getElementById('dm-slider');
+            const trialDM = slider ? slider.value : '550';
+
+            let csvContent = "data:text/csv;charset=utf-8,Time_Bin,Dedispersed_Raw,UAPIS_Filtered_Profile\n";
+            for (let i = 0; i < lastProcessedRaw.length; i++) {
+                csvContent += i + "," + lastProcessedRaw[i].toFixed(4) + "," + lastProcessedFiltered[i].toFixed(4) + "\n";
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "frb_processed_dm_" + trialDM + ".csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         function renderProfilesOnCanvas(rawProfile, filteredProfile) {
@@ -587,7 +600,6 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             const numBins = rawProfile.length;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Background Grid
             ctx.strokeStyle = '#21262d';
             ctx.lineWidth = 1;
             for (let y = 0; y < canvas.height; y += 40) {
@@ -601,7 +613,6 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             const mapX = (bin) => (bin / (numBins - 1)) * canvas.width;
             const mapY = (val) => canvas.height - ((val / maxVal) * (canvas.height - 20)) - 10;
 
-            // Plot 1: Raw Dedispersed (Red)
             ctx.beginPath();
             ctx.strokeStyle = '#ff5555';
             ctx.lineWidth = 1.8;
@@ -613,7 +624,6 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             }
             ctx.stroke();
 
-            // Plot 2: Filtered (Green)
             ctx.beginPath();
             ctx.strokeStyle = '#50fa7b';
             ctx.lineWidth = 2.2;
@@ -626,14 +636,15 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             ctx.stroke();
         }
 
-        // Initialize synthetic spectrograph on page load
         window.onload = function() {
             generateSyntheticSpectrograph();
             updateWorkbenchAnalysis();
         };
+
+        window.addEventListener('resize', () => {
+            updateWorkbenchAnalysis();
+        });
     </script>
-
-
 </body>
 </html>
 
