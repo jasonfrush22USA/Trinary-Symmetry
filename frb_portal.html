@@ -248,7 +248,7 @@
 
     <main>
         <h1>Fast Radio Burst (FRB) Dispersion &amp; Scattering Explorer</h1>
-   
+ 
         <section id="overview">
             <h2>1. Astrophysical Context &amp; Overview</h2>
             <p>Fast Radio Bursts (FRBs) are millisecond-long energetic radio flashes originating from cosmological distances. As these pulses travel through ionized plasma across the universe, free electrons imprint a distinct frequency-dependent time delay known as dispersion, alongside multipath scattering tails caused by turbulent plasma structures along the line of sight.</p>
@@ -283,26 +283,26 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         <section id="workbench" class="workbench">
             <h2>5. Interactive FRB Event Workbench</h2>
             <p>Load the embedded catalog of known FRB source events or upload custom burst telemetry files to evaluate electron column density parameters and scattering indices instantly:</p>
-       
+     
             <button class="btn btn-secondary" type="button" onclick="loadSampleFRBs()">Load Sample FRB Catalog</button>
-       
+     
             <input type="file" id="frb-file-input" accept=".csv,.txt,.dat,.json,.fil">
             <button class="btn" type="button" onclick="processFRBFile()">Run Dispersion Screen</button>
             <button class="btn btn-secondary" type="button" onclick="exportProcessedCSV()">Export Processed CSV</button>
-       
+     
             <div id="output-container"></div>
 
             <div class="filter-box">
                 <h3>Cold Plasma Dedispersion &amp; UAPIS Phase Engine</h3>
                 <p>Adjust the trial Dispersion Measure (<strong>DM</strong>) to align frequency arrival channels in real time before passing the dedispersed profile into the Mod-6 phase filter:</p>
-             
+           
                 <div class="slider-box">
                     <label for="dm-slider">Trial Dispersion Measure (DM): <span id="dm-val-display" style="color: var(--accent-color);">550</span> pc/cm³ (Target DM ~ 558 pc/cm³)</label>
                     <input type="range" id="dm-slider" min="0" max="1000" step="1" value="550" oninput="updateWorkbenchAnalysis()">
                 </div>
 
-                <button class="btn" type="button" onclick="updateWorkbenchAnalysis()">Re-Run Dedispersion &amp; Phase Filter</button>
-             
+                <button class="btn" type="button" onclick="rerunWorkbench()">Re-Run Dedispersion &amp; Phase Filter</button>
+           
                 <div id="metrics-container"></div>
 
                 <div class="canvas-container">
@@ -335,7 +335,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         const numTimeBins = 160;
         const freqLowGHz = 1.2;
         const freqHighGHz = 1.6;
-       
+     
         let syntheticSpectrograph = [];
         let activeProfile = null;
         let lastProcessedRaw = null;
@@ -379,7 +379,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     try {
                         const buffer = e.target.result;
                         const bytes = new Uint8Array(buffer);
-                   
+                 
                         let dataStart = 1024;
                         const marker = "HEADER_END";
                         for (let i = 0; i < Math.min(bytes.length - marker.length, 4096); i++) {
@@ -392,7 +392,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
 
                         const rawBuffer = buffer.slice(dataStart);
                         const floatView = new Float32Array(rawBuffer);
-                   
+                 
                         if (floatView.length === 0) {
                             alert("Error: File contains no numerical payload past the header.");
                             return;
@@ -400,7 +400,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
 
                         const cleanFloats = [];
                         const stride = Math.max(1, Math.floor(floatView.length / numTimeBins));
-                   
+                 
                         for (let i = 0; i < floatView.length; i += stride) {
                             const val = floatView[i];
                             if (Number.isFinite(val) && val !== 0) {
@@ -416,7 +416,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                         const maxVal = Math.max(...cleanFloats);
                         const minVal = Math.min(...cleanFloats);
                         const range = (maxVal - minVal) || 1.0;
-                       
+                     
                         activeProfile = [];
                         for(let i = 0; i < numTimeBins; i++) {
                             let val = cleanFloats[i % cleanFloats.length];
@@ -522,6 +522,11 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             return rmsNoise > 0 ? (peakSignal - meanNoise) / rmsNoise : 0.0;
         }
 
+        function rerunWorkbench() {
+            generateSyntheticSpectrograph();
+            updateWorkbenchAnalysis();
+        }
+
         function updateWorkbenchAnalysis() {
             const slider = document.getElementById('dm-slider');
             const display = document.getElementById('dm-val-display');
@@ -538,12 +543,14 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     return (targetIdx >= 0 && targetIdx < activeProfile.length) ? activeProfile[targetIdx] : 0.0;
                 });
             } else {
+                if (syntheticSpectrograph.length === 0) {
+                    generateSyntheticSpectrograph();
+                }
                 currentRaw = dedisperseSpectrograph(trialDM);
             }
 
             const filteredProfile = applyMod6Filter(currentRaw);
 
-            // Store globally for export functions
             lastProcessedRaw = currentRaw;
             lastProcessedFiltered = filteredProfile;
 

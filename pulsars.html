@@ -222,14 +222,16 @@
             height: 12px;
             border-radius: 2px;
         }
-        var {
-            font-style: italic;
-            font-family: "Times New Roman", Times, serif;
-        }
         .math-block {
-            font-family: "Times New Roman", Times, serif;
-            font-size: 1.05rem;
-            padding: 8px 12px;
+            font-family: Georgia, serif;
+            font-size: 1.15rem;
+            padding: 12px 18px;
+            background-color: var(--code-bg);
+            border-left: 4px solid var(--accent-color);
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: center;
+            color: #1a252f;
         }
     </style>
 </head>
@@ -257,17 +259,20 @@
         <section id="timing">
             <h2>2. Pulse Period Folding Mechanics</h2>
             <div class="card">
-                <p>To extract faint periodic signals from background noise, time-series data is folded modulo the pulsar's spin period (<var>P</var>) across thousands of rotations into discrete phase bins:</p>
+                <p>To extract faint periodic signals from background noise, time-series data is folded modulo the pulsar's spin period (<i>P</i>) across thousands of rotations into discrete phase bins:</p>
                 <div class="math-block">
-                    <pre><code>\Phi(t) = \left( \frac{t}{P} - \lfloor \frac{t}{P} \rfloor \right) \times N_{\text{bins}}</code></pre>
+                    <i>&Phi;</i>(<i>t</i>) = ( <sup><i>t</i></sup>&frasl;<sub><i>P</i></sub> &minus; &lfloor;<sup><i>t</i></sup>&frasl;<sub><i>P</i></sub>&rfloor; ) &times; <i>N</i><sub>bins</sub>
                 </div>
-                <p>Where <strong><var>P</var></strong> represents the spin period [s] and <strong><var>N</var><sub>bins</sub></strong> is the resolution of the folded pulse profile.</p>
+                <p>Where <strong><i>P</i></strong> represents the spin period [s] and <strong><i>N</i><sub>bins</sub></strong> is the resolution of the folded pulse profile.</p>
             </div>
         </section>
 
         <section id="ism">
             <h2>3. Interstellar Dispersion Measure (DM)</h2>
-            <p>The cold plasma dispersion relation delays lower radio frequencies by an amount proportional to the column density of free electrons along the galactic line of sight: <strong>DM</strong> = &int; <var>n</var><sub><var>e</var></sub> d<var>l</var> [pc cm<sup>-3</sup>]. Correct dedispersion aligns pulses across frequency sub-bands prior to phase folding.</p>
+            <p>The cold plasma dispersion relation delays lower radio frequencies by an amount proportional to the column density of free electrons along the galactic line of sight:</p>
+            <div class="math-block">
+                <strong>DM</strong> = &int; <i>n</i><sub><i>e</i></sub> d<i>l</i> &nbsp; [pc cm<sup>&minus;3</sup>]
+            </div>
         </section>
 
         <section id="pipeline">
@@ -311,7 +316,7 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
                     <input type="range" id="period-slider" min="0.1" max="2.0" step="0.0001" value="0.7156" oninput="updateWorkbenchAnalysis()">
                 </div>
 
-                <button class="btn" type="button" onclick="updateWorkbenchAnalysis()">Re-Run Folding &amp; Phase Filter</button>
+                <button class="btn" type="button" onclick="triggerManualReRun()">Re-Run Folding &amp; Phase Filter</button>
              
                 <div id="metrics-container"></div>
 
@@ -438,7 +443,7 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             }
 
             let html = '<h3>Analysis Results (' + sourceLabel + ')</h3>';
-            html += '<table><tr><th>Pulsar ID</th><th>Coordinates</th><th>Spin Period (P)</th><th>Dispersion Measure</th><th>Period Derivative ($\dot{P}$)</th><th>Classification</th></tr>';
+            html += '<table><tr><th>Pulsar ID</th><th>Coordinates</th><th>Spin Period (P)</th><th>Dispersion Measure</th><th>Period Derivative (P-dot)</th><th>Classification</th></tr>';
 
             for (let i = 1; i < lines.length; i++) {
                 const cols = lines[i].split(',');
@@ -464,7 +469,7 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             const peakCenter = Math.floor(numTimeBins / 2) + Math.round((trialPeriod - truePeriod) * 100);
 
             for (let i = 0; i < numTimeBins; i++) {
-                let noise = (Math.random() - 0.5) * 3.0;
+                let noise = (Math.random() - 0.5) * 4.0;
                 let dist = Math.abs(i - (peakCenter % numTimeBins));
                 if (dist > numTimeBins / 2) dist = numTimeBins - dist;
                
@@ -497,7 +502,7 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             return rmsNoise > 0 ? (peakSignal - meanNoise) / rmsNoise : 0.0;
         }
 
-        function updateWorkbenchAnalysis() {
+        function updateWorkbenchAnalysis(forceRefresh = false) {
             const slider = document.getElementById('period-slider');
             const display = document.getElementById('period-val-display');
             if (!slider || !display) return;
@@ -506,7 +511,7 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             display.innerText = trialPeriod.toFixed(4);
 
             let currentRaw;
-            if (activeProfile && activeProfile.length > 0) {
+            if (activeProfile && activeProfile.length > 0 && !forceRefresh) {
                 const shift = Math.round((trialPeriod - truePeriod) * 200.0);
                 currentRaw = activeProfile.map((val, idx) => {
                     let targetIdx = idx - shift;
@@ -529,10 +534,15 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             const metricsDiv = document.getElementById('metrics-container');
             if (metricsDiv) {
                 metricsDiv.innerHTML = '<div class="metrics-badge">Folded Profile SNR: ' + computedSNR.toFixed(2) + '</div>' +
-                                      '<div class="metrics-badge">Phase Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
+                                      '<div class="metrics-badge">Phase Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>' +
+                                      (forceRefresh ? '<div class="metrics-badge" style="background:#d4efdf; color:#145a32;">[+] Re-evaluated &amp; Refreshed</div>' : '');
             }
 
             renderProfilesOnCanvas(currentRaw, filteredProfile);
+        }
+
+        function triggerManualReRun() {
+            updateWorkbenchAnalysis(true);
         }
 
         function calculateVariance(arr) {
@@ -587,7 +597,6 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             const mapX = (bin) => (bin / (numBins - 1)) * canvas.width;
             const mapY = (val) => canvas.height - ((val / maxVal) * (canvas.height - 20)) - 10;
 
-            // Plot 1: Folded Raw Profile (Blue)
             ctx.beginPath();
             ctx.strokeStyle = '#5dade2';
             ctx.lineWidth = 1.8;
@@ -599,7 +608,6 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
             }
             ctx.stroke();
 
-            // Plot 2: Filtered Profile (Green)
             ctx.beginPath();
             ctx.strokeStyle = '#52be80';
             ctx.lineWidth = 2.2;
@@ -622,3 +630,4 @@ def fold_pulsar_timeseries(signal: np.ndarray, period_s: float, sample_rate_hz: 
     </script>
 </body>
 </html>
+
