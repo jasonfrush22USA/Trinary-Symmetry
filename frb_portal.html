@@ -347,17 +347,17 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                 let timeRow = [];
                 for (let ch = 0; ch < numChannels; ch++) {
                     let freqGHz = freqLowGHz + (ch * df);
-                   
+                 
                     // True dispersion delay given trueDM
                     let delayMs = k * trueDM * (Math.pow(freqGHz, -2) - Math.pow(freqHighGHz, -2));
                     let delayBins = Math.round(delayMs / 4.0); // 4ms per time bin scaling
-                   
+                 
                     let noise = (Math.random() - 0.5) * 4.0;
-                   
+                 
                     // Dispersed burst arrival peak
                     let truePeakLocation = 30 + delayBins;
                     let signal = Math.exp(-Math.pow((t - truePeakLocation) / 3.0, 2)) * 25.0;
-                   
+                 
                     timeRow.push(10.0 + noise + Math.max(0, signal));
                 }
                 syntheticSpectrograph.push(timeRow);
@@ -382,7 +382,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     try {
                         const buffer = e.target.result;
                         const bytes = new Uint8Array(buffer);
-                       
+                     
                         // 1. Safe Header Parsing: Search for "HEADER_END" or skip first 1024 bytes
                         let dataStart = 1024; // Fallback Sigproc header size
                         const marker = "HEADER_END";
@@ -397,7 +397,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                         // 2. Extract Data Portion
                         const rawBuffer = buffer.slice(dataStart);
                         const floatView = new Float32Array(rawBuffer);
-                       
+                     
                         if (floatView.length === 0) {
                             alert("Error: File contains no numerical payload past the header.");
                             return;
@@ -406,7 +406,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                         // 3. Filter out NaNs / Infs and collapse down into 160 time bins for Canvas
                         const cleanFloats = [];
                         const stride = Math.max(1, Math.floor(floatView.length / 160));
-                       
+                     
                         for (let i = 0; i < floatView.length; i += stride) {
                             const val = floatView[i];
                             if (Number.isFinite(val) && val !== 0) {
@@ -446,7 +446,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                         alert("JavaScript Execution Error: " + err.message);
                     }
                 };
-               
+             
                 reader.onerror = function() {
                     alert("File Loading Error: Could not read file from disk.");
                 };
@@ -518,7 +518,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
                     }
                 }
             }
-           
+         
             // Average across channels
             return Array.from(dedispersedProfile).map(v => v / numChannels);
         }
@@ -531,11 +531,11 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             for (let i = 0; i < rawProfile.length; i++) {
                 const val = rawProfile[i];
                 const polarity = val >= baseline ? 1.0 : -1.0;
-               
+             
                 // Mod-6 Phase Shift Map: (k * pi/3) + polarity * (pi/2)
                 const phaseAngle = (i * Math.PI / 3.0) + (polarity * Math.PI / 2.0);
                 const filteredVal = Math.abs(val * Math.cos(phaseAngle));
-               
+             
                 filtered.push(filteredVal);
             }
             return filtered;
@@ -543,33 +543,32 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
 
         // --- Interactive Controller & Canvas Renderer ---
         function updateWorkbenchAnalysis() {
-    const slider = document.getElementById('dm-slider');
-    const display = document.getElementById('dm-val-display');
-    if (!slider || !display) return;
+            const slider = document.getElementById('dm-slider');
+            const display = document.getElementById('dm-val-display');
+            if (!slider || !display) return;
 
-    const trialDM = parseFloat(slider.value);
-    display.innerText = trialDM;
+            const trialDM = parseFloat(slider.value);
+            display.innerText = trialDM;
 
-    // 1. Run Client-Side Dedispersion
-    const dedispersedProfile = dedisperseSpectrograph(trialDM);
+            // 1. Run Client-Side Dedispersion
+            const dedispersedProfile = dedisperseSpectrograph(trialDM);
 
-    // 2. Pass Dedispersed Profile into UAPIS Mod-6 Engine
-    const filteredProfile = applyMod6Filter(dedispersedProfile);
+            // 2. Pass Dedispersed Profile into UAPIS Mod-6 Engine
+            const filteredProfile = applyMod6Filter(dedispersedProfile);
 
-    // 3. Render Metrics & Canvas
-    const rawVar = calculateVariance(dedispersedProfile);
-    const filtVar = calculateVariance(filteredProfile);
-    const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
+            // 3. Render Metrics & Canvas
+            const rawVar = calculateVariance(dedispersedProfile);
+            const filtVar = calculateVariance(filteredProfile);
+            const noiseSuppression = (1.0 - (filtVar / (rawVar + 1e-12))) * 100.0;
 
-    const metricsDiv = document.getElementById('metrics-container');
-    if (metricsDiv) {
-        metricsDiv.innerHTML = '<div class="metrics-badge">Dedispersed Peak SNR: ' + (Math.max(...dedispersedProfile) / 10.0).toFixed(2) + '</div>' +
-                              '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
-    }
+            const metricsDiv = document.getElementById('metrics-container');
+            if (metricsDiv) {
+                metricsDiv.innerHTML = '<div class="metrics-badge">Dedispersed Peak SNR: ' + (Math.max(...dedispersedProfile) / 10.0).toFixed(2) + '</div>' +
+                                      '<div class="metrics-badge">UAPIS Noise Suppression: ' + noiseSuppression.toFixed(2) + '%</div>';
+            }
 
-    renderProfilesOnCanvas(dedispersedProfile, filteredProfile);
-}
-
+            renderProfilesOnCanvas(dedispersedProfile, filteredProfile);
+        }
 
         function calculateVariance(arr) {
             const mean = arr.reduce((a, b) => a + b, 0) / arr.length;
@@ -577,63 +576,32 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
         }
 
         function renderProfilesOnCanvas(rawProfile, filteredProfile) {
-    const canvas = document.getElementById('frbCanvas');
-    if (!canvas || !rawProfile || !filteredProfile) return;
+            const canvas = document.getElementById('frbCanvas');
+            if (!canvas || !rawProfile || !filteredProfile) return;
 
-    const ctx = canvas.getContext('2d');
-    const containerWidth = canvas.parentElement ? canvas.parentElement.clientWidth - 30 : 800;
-    canvas.width = Math.max(containerWidth, 300);
-    canvas.height = 260;
+            const ctx = canvas.getContext('2d');
+            const containerWidth = canvas.parentElement ? canvas.parentElement.clientWidth - 30 : 800;
+            canvas.width = Math.max(containerWidth, 300);
+            canvas.height = 260;
 
-    const numBins = rawProfile.length;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const numBins = rawProfile.length;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background Grid
-    ctx.strokeStyle = '#21262d';
-    ctx.lineWidth = 1;
-    for (let y = 0; y < canvas.height; y += 40) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
+            // Background Grid
+            ctx.strokeStyle = '#21262d';
+            ctx.lineWidth = 1;
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
 
-    const maxVal = Math.max(...rawProfile, ...filteredProfile, 1.0) * 1.1;
-    const mapX = (bin) => (bin / (numBins - 1)) * canvas.width;
-    const mapY = (val) => canvas.height - ((val / maxVal) * (canvas.height - 20)) - 10;
-
-    // Plot 1: Raw Dedispersed
-    ctx.beginPath();
-    ctx.strokeStyle = '#ff5555';
-    ctx.lineWidth = 1.8;
-    for (let i = 0; i < numBins; i++) {
-        const x = mapX(i);
-        const y = mapY(rawProfile[i]);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-
-    // Plot 2: Filtered
-    ctx.beginPath();
-    ctx.strokeStyle = '#50fa7b';
-    ctx.lineWidth = 2.2;
-    for (let i = 0; i < numBins; i++) {
-        const x = mapX(i);
-        const y = mapY(filteredProfile[i]);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-}
-
-
-
-            const maxVal = Math.max(...rawProfile, ...filteredProfile) * 1.1;
+            const maxVal = Math.max(...rawProfile, ...filteredProfile, 1.0) * 1.1;
             const mapX = (bin) => (bin / (numBins - 1)) * canvas.width;
             const mapY = (val) => canvas.height - ((val / maxVal) * (canvas.height - 20)) - 10;
 
-            // Plot 1: Dedispersed Profile (Red)
+            // Plot 1: Raw Dedispersed (Red)
             ctx.beginPath();
             ctx.strokeStyle = '#ff5555';
             ctx.lineWidth = 1.8;
@@ -645,7 +613,7 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             }
             ctx.stroke();
 
-            // Plot 2: UAPIS Mod-6 Phase Filtered Profile (Green)
+            // Plot 2: Filtered (Green)
             ctx.beginPath();
             ctx.strokeStyle = '#50fa7b';
             ctx.lineWidth = 2.2;
@@ -664,6 +632,8 @@ def calculate_dispersion_delay(dm: float, freq_low_ghz: float, freq_high_ghz: fl
             updateWorkbenchAnalysis();
         };
     </script>
+
+
 </body>
 </html>
 
