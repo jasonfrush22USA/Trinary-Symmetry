@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trinary Symmetry Framework | Dual Anti-Parallel Wave Visualizer</title>
+    <meta name="description" content="Interactive visualizer displaying the dual anti-parallel wave oscillators of the modulo-6 phase cancellation engine.">
+    <!-- Include Chart.js for smooth mathematical plotting -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #24292e;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #f6f8fa;
+        }
+        header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e1e4e8;
+            padding-bottom: 1rem;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .card {
+            background: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            margin-bottom: 1.5rem;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        .values {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #586069;
+            margin-top: 0.2rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+        }
+        .toggle-btn {
+            background-color: #0366d6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .toggle-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "name": "Dual Anti-Parallel Wave Visualizer",
+      "headline": "Mod-6 Anti-Parallel Dual Wave Oscillators",
+      "description": "Interactive web visualization showing the two opposing harmonic waves of the Trinary Symmetry Framework cancellation engine.",
+      "url": "https://jasonfrush22usa.github.io/Trinary-Symmetry/visualizer-dual.html",
+      "author": {
+        "@type": "Person",
+        "name": "Jason Frush"
+      }
+    }
+    </script>
+</head>
+<body>
+
+    <header>
+        <h1>Dual Anti-Parallel Wave Visualizer</h1>
+        <p>Interactive tracking of the two phase-locked harmonic oscillators governing the Modulo-6 cancellation engine[span_0](start_span)[span_0](end_span).</p>
+    </header>
+
+    <div class="card">
+        <div class="controls">
+            <div class="control-group">
+                <label for="xMin">Start Range (<em>x</em><sub>1</sub>): <span id="minVal" class="values">2</span></label>
+                <input type="range" id="xMin" min="2" max="100" value="2" step="1">
+            </div>
+            <div class="control-group">
+                <label for="xMax">End Range (<em>x</em><sub>2</sub>): <span id="maxVal" class="values">50</span></label>
+                <input type="range" id="xMax" min="10" max="200" value="50" step="1">
+            </div>
+        </div>
+
+        <button class="toggle-btn" id="expandBtn">Toggle Expand View</button>
+    </div>
+
+    <div class="card" id="graphCard">
+        <div class="chart-container">
+            <canvas id="phaseChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        function isPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+
+        function generateData(min, max) {
+            const labels = [];
+            const primeSpikesData = [];
+            const wave1Data = [];
+            const wave2Data = [];
+
+            const step = 0.2;
+            for (let x = min; x <= max; x += step) {
+                let roundedX = Math.round(x * 10) / 10;
+                labels.push(roundedX);
+
+                let envelope = 1.2 / (1 + 0.03 * Math.abs(x));
+               
+                let w1 = Math.sin((Math.PI * x) / 3) * envelope;
+                let w2 = Math.sin((Math.PI * x / 3) + Math.PI) * envelope;
+
+                wave1Data.push(w1);
+                wave2Data.push(w2);
+            }
+
+            const alignedSpikes = labels.map(lbl => {
+                if (Math.abs(lbl - Math.round(lbl)) < 0.01) {
+                    let iv = Math.round(lbl);
+                    return (iv >= min && iv <= max && isPrime(iv)) ? Math.log(iv) : 0;
+                }
+                return 0;
+            });
+
+            return { labels, alignedSpikes, wave1Data, wave2Data };
+        }
+
+        const ctx = document.getElementById('phaseChart').getContext('2d');
+        const initialData = generateData(2, 50);
+
+        const phaseChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: initialData.labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Prime Support Spikes (\u039b(n))',
+                        data: initialData.alignedSpikes,
+                        backgroundColor: 'rgba(3, 102, 214, 0.75)',
+                        borderColor: 'rgba(3, 102, 214, 1)',
+                        borderWidth: 1,
+                        order: 3
+                    },
+                    {
+                        type: 'line',
+                        label: 'Wave 1 (Primary Phase Oscillator)',
+                        data: initialData.wave1Data,
+                        borderColor: 'rgba(228, 86, 39, 1)',
+                        backgroundColor: 'rgba(228, 86, 39, 0.05)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: false,
+                        order: 1
+                    },
+                    {
+                        type: 'line',
+                        label: 'Wave 2 (Anti-Parallel Opposing Oscillator)',
+                        data: initialData.wave2Data,
+                        borderColor: 'rgba(88, 166, 255, 1)',
+                        backgroundColor: 'rgba(88, 166, 255, 0.05)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4,
+                        fill: false,
+                        order: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Continuous Continuum Index (x)' },
+                        ticks: { maxTicksLimit: 15 }
+                    },
+                    y: {
+                        title: { display: true, text: 'Oscillator Amplitude' },
+                        suggestedMin: -2.5,
+                        suggestedMax: 3.5
+                    }
+                }
+            }
+        });
+
+        const xMinInput = document.getElementById('xMin');
+        const xMaxInput = document.getElementById('xMax');
+        const minValSpan = document.getElementById('minVal');
+        const maxValSpan = document.getElementById('maxVal');
+
+        function updateChart() {
+            let min = parseInt(xMinInput.value);
+            let max = parseInt(xMaxInput.value);
+
+            if (min >= max) {
+                min = max - 5;
+                xMinInput.value = min;
+            }
+
+            minValSpan.textContent = min;
+            maxValSpan.textContent = max;
+
+            const newData = generateData(min, max);
+            phaseChart.data.labels = newData.labels;
+            phaseChart.data.datasets[0].data = newData.alignedSpikes;
+            phaseChart.data.datasets[1].data = newData.wave1Data;
+            phaseChart.data.datasets[2].data = newData.wave2Data;
+            phaseChart.update();
+        }
+
+        xMinInput.addEventListener('input', updateChart);
+        xMaxInput.addEventListener('input', updateChart);
+
+        const expandBtn = document.getElementById('expandBtn');
+        const graphCard = document.getElementById('graphCard');
+        let isExpanded = false;
+
+        expandBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                graphCard.style.position = 'fixed';
+                graphCard.style.top = '20px';
+                graphCard.style.left = '20px';
+                graphCard.style.width = 'calc(100% - 40px)';
+                graphCard.style.height = 'calc(100vh - 40px)';
+                graphCard.style.zIndex = '1000';
+                expandBtn.textContent = 'Collapse View';
+            } else {
+                graphCard.style.position = 'static';
+                graphCard.style.width = '100%';
+                graphCard.style.height = 'auto';
+                expandBtn.textContent = 'Toggle Expand View';
+            }
+            phaseChart.resize();
+        });
+    </script>
+</body>
+</html>
+
