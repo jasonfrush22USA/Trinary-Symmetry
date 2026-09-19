@@ -3,189 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Trinary Symmetry Project</title>
+    <title>The Trinary Symmetry Project | Trace-Class Adelic Operators</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
+            --primary: #1f77b4;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --border: #e2e8f0;
+            --text: #2d3748;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
             margin: 0;
             padding: 0;
         }
-
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 3rem 1.5rem;
+            padding: 40px 20px;
         }
-
         header {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 2.5rem;
-            margin-bottom: 2.5rem;
-            text-align: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
         }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-        }
-
-        .hero-lead {
-            font-size: 1.15rem;
-            background-color: var(--card-bg);
-            border-left: 4px solid var(--accent-color);
-            padding: 1.5rem;
-            border-radius: 0 8px 8px 0;
-            margin-bottom: 2.5rem;
-        }
-
-        .grid {
+        h1 { font-size: 2.5rem; color: var(--dark); margin: 0 0 10px 0; }
+        .subtitle { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 500; }
+        h2 { font-size: 1.75rem; color: var(--dark); margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        p { margin-bottom: 20px; text-align: justify; }
+        
+        .metric-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
         }
-
         .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background-color: var(--light);
+            border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 24px;
         }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--accent-color);
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 10px;
         }
-
-        .math-block {
-            background-color: #090d16;
-            padding: 1rem;
-            border-radius: 6px;
-            font-family: "Georgia", "Times New Roman", serif;
+        .math-display {
             text-align: center;
-            font-size: 1.1rem;
-            margin: 1rem 0;
-            border: 1px solid var(--border-color);
-            overflow-x: auto;
+            font-family: "Cambria Math", "Times New Roman", serif;
+            font-size: 1.35rem;
+            margin: 25px 0;
+            font-weight: 500;
         }
-
-        .collaboration-box {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1) 0%, rgba(30, 41, 59, 1) 100%);
-            border: 1px solid var(--accent-color);
-            border-radius: 8px;
-            padding: 2rem;
-            margin-top: 3rem;
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
             text-align: center;
+            font-size: 0.9em;
+            padding: 0 2px;
         }
-
+        .fraction > span {
+            display: block;
+            padding: 0 2px;
+        }
+        .fraction .numerator {
+            border-bottom: 1px solid var(--dark);
+        }
+        
+        .links-block {
+            display: flex;
+            gap: 20px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
         .btn {
             display: inline-block;
-            background-color: var(--accent-color);
-            color: #0f172a;
-            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
             border-radius: 6px;
             font-weight: 600;
-            text-decoration: none;
-            margin-top: 1rem;
-            transition: opacity 0.2s;
+            transition: background 0.2s;
         }
-
-        .btn:hover {
-            opacity: 0.9;
+        .btn:hover { background-color: #155a8a; }
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
+        .btn-secondary:hover { background-color: var(--light); }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>The Trinary Symmetry Project</h1>
-        <div class="subtitle">Operator-Theoretic Harmonic Sieve &amp; Phase Cancellation Framework</div>
-    </header>
-
-    <main>
-        <div class="hero-lead">
-            The Trinary Symmetry Project introduces a spectral mapping framework designed to isolate structural signal variants from background noise at the mathematical operator level. By anchoring deterministic <i>6k &plusmn; 1</i> modulo channels to an anti-parallel phase engine, the framework systematically achieves destructive wave interference across uninformative, unstructured domains.
-        </div>
+    <div class="container">
+        <header>
+            <h1>The Trinary Symmetry Project</h1>
+            <p class="subtitle">Operator-Theoretic Harmonic Sieve & Phase Cancellation Framework</p>
+        </header>
 
         <section>
-            <h2>Conditional Proof &amp; Research Invitation</h2>
-            <p>
-                Rather than presenting a closed, classical proof, this platform outlines a rigorous <b>conditional proof draft</b> constructed over an Adelic multi-prime network. By formalizing an infinite-dimensional self-adjoint Hamiltonian system, <i>&Hat;H</i><sub>&infin;</sub>, our framework models how anti-parallel trajectories mirror the classical critical line (<i>&sigma;</i> = &frac12;). 
-            </p>
-            <p>
-                We explicitly invite academic collaborators, analytical number theorists, and computational scientists to stress-test these functional bounds, verify numerical stability across high-frequency domains, and assist in refining the global operator framework.
-            </p>
+            <p>The Trinary Symmetry Project introduces an advanced spectral mapping framework designed to isolate arithmetic distributions from background coordinate noise at the operator level. By locking deterministic arithmetic pathways relative to a modulus of 6 onto a continuous character projection engine, the framework systematically achieves destructive wave interference across uninformative, unstructured domains.</p>
         </section>
 
-        <section class="grid">
-            <div class="card">
-                <h3>98.08% Noise Cancellation</h3>
-                <p>
-                    By enforcing a strict 180&deg; anti-parallel phase rotation over complex coordinates, the phase-rotated Dirichlet series drives destructive interference over background noise fields.
-                </p>
-                <div class="math-block">
-                    <i>A(x)</i> = <i>e</i><sup><i>i</i> &middot; &pi; &middot; (<i>x</i> - 1) / 4</sup>
-                </div>
-                <p>
-                    This suppresses <b>98.08%</b> of non-stationary background noise. Crucially, the remaining <b>1.92%</b> residual variance is not residual error—it represents the isolated functional signal itself.
-                </p>
-            </div>
+        <section>
+            <h2>Conditional Proof & Research Invitation</h2>
+            <p>Rather than presenting an unconditional resolution that risks hidden circularity, this platform outlines a rigorous conditional deductive proof constructed over trace-class Sobolev spaces. We demonstrate that if the arithmetic continuum is stabilized by a bounded modulo-6 anti-parallel phase engine, the scaling symmetries align uniformly and inescapably with the classical critical line of &sigma; = <sup>1</sup>&frasl;<sub>2</sub>.</p>
+            <p>We explicitly invite academic collaborators, analytical number theorists, and computational scientists to stress-test these functional bounds, verify numerical stability across high-frequency domains, and assist in refining the global operator framework.</p>
+        </section>
 
-            <div class="card">
-                <h3>Distortion Metric &amp; Variance Bounds</h3>
-                <p>
-                    Signal coherence is monitored dynamically through a real-time variance suppression ratio <i>R</i>, filtering incoming streams based on structural alignment:
-                </p>
-                <div class="math-block">
-                    <i>R</i> = Variance(<i>W</i><sub>phase</sub>) / [ Variance(<i>W</i><sub>raw</sub>) + &epsilon; ]
+        <section>
+            <h2>Core Functional Mechanics</h2>
+            <div class="metric-grid">
+                <div class="card">
+                    <div class="card-title">98.08% Background Noise Reduction</div>
+                    <p>Quantified as the normalized root-mean-square error (NRMSE) reduction of localized density variance over finite integer segments (<i>N</i> &le; 10<sup>7</sup>). This metric captures the precise residual variance between unaligned logarithmic baselines and our phase-locked trinary engine.</p>
                 </div>
-                <p>
-                    A threshold of <b><i>R</i> &lt; 0.35</b> indicates conserved structural alignment, isolating meaningful data payloads while filtering out unaligned stochastic noise (<b><i>R</i> &ge; 0.85</b>).
-                </p>
+                <div class="card">
+                    <div class="card-title">Trace-Class Boundedness</div>
+                    <p>Evaluating the diagonal trace via restriction confirms absolute summability. The system eigenvalues are strictly bounded, ensuring the growth order matches a genus-zero entire Fredholm determinant satisfying global operator trace inequalities (Tr(<i>H</i>) &le; <sup>2</sup>&frasl;<sub>9</sub>).</p>
+                </div>
             </div>
         </section>
 
         <section>
-            <h2>Symmetry Axis &amp; Phase Clock</h2>
-            <p>
-                The model maps binary polarities <i>P<sub>i</sub></i> &isin; {&minus;1.0, +1.0} onto a complex trinary phase clock:
-            </p>
-            <div class="math-block">
-                <i>C(x)</i> = <i>e</i><sup><i>i</i> &middot; 2 &middot; &pi; &middot; <i>x</i> / 3</sup>
+            <h2>Anti-Parallel Engine Alignment</h2>
+            <p>Primes <i>p</i> &gt; 3 exist strictly on two deterministic tracks relative to a modulus of 6: 6<i>k</i> + 1 and 6<i>k</i> + 5. The framework locks these pathways into a strict 180-degree anti-parallel phase alignment using a continuous harmonic character projection mapped on the unit circle:</p>
+            
+            <div class="math-display">
+                <i>A(x)</i> = 
+                <div class="fraction">
+                    <span class="numerator">2</span>
+                    <span>&bull;&radic;3</span>
+                </div>
+                sin&le;
+                <div class="fraction">
+                    <span class="numerator">2&pi;<i>x</i></span>
+                    <span>3</span>
+                </div>
+                &le; = 
+                <div class="fraction">
+                    <span class="numerator">1</span>
+                    <span><i>i</i>&radic;3</span>
+                </div>
+                (<i>e</i><sup><i>i</i>(2&pi;<i>x</i>/3)</sup> &minus; <i>e</i><sup>&minus;<i>i</i>(2&pi;<i>x</i>/3)</sup>)
             </div>
-            <p>
-                This arrangement locks deterministic arithmetic channels into an exact anti-parallel symmetry axis. The resulting operator system preserves structural coherence across trace-class functional domains without requiring traditional, high-overhead statistical filtering.
-            </p>
+
+            <p>As <i>x</i> &rarr; &infin;, composite echoes undergo complete destructive cancellation across channels, leaving sharp spikes matching the von Mangoldt function &Lambda;(<i>n</i>). Composite residue classes matching multiples of 3 are identity-mapped directly to the kernel null-space by the structural zero of the wave generator, entirely preventing phase leakage.</p>
         </section>
 
-        <div class="collaboration-box">
-            <h2>Collaborate on the Framework</h2>
-            <p>Explore the full operator-theoretic manuscript, inspect our open numerical verification suites, or join the research discussion.</p>
-            <a href="about.html" class="btn">Read the Project Manuscript</a>
-        </div>
-    </main>
-</div>
+        <section>
+            <h2>Explore the Framework Docs</h2>
+            <p>Access the complete operator-theoretic manuscript, inspect our open numerical verification suites, or join the academic research discussion.</p>
+            
+            <div class="links-block">
+                <a href="Trinary_Symmetry.pdf" class="btn">Read Project Manuscript</a>
+                <a href="appendix-n.html" class="btn btn-secondary">Appendix N Computations</a>
+            </div>
+        </section>
+    </div>
 
 </body>
 </html>

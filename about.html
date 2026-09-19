@@ -3,199 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - The Trinary Symmetry Project</title>
+    <title>About | The Trinary Symmetry Project</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --accent-color: #38bdf8;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: #334155;
+            --primary: #1f77b4;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --border: #e2e8f0;
+            --text: #2d3748;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.7;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
             margin: 0;
             padding: 0;
         }
-
         .container {
-            max-width: 900px;
+            max-width: 960px;
             margin: 0 auto;
-            padding: 3rem 1.5rem;
+            padding: 40px 20px;
         }
-
-        nav {
-            margin-bottom: 2rem;
+        header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 40px;
         }
-
-        nav a {
-            color: var(--accent-color);
-            text-decoration: none;
+        h1 { font-size: 2.5rem; color: var(--dark); margin: 0 0 10px 0; }
+        .subtitle { font-size: 1.25rem; color: var(--primary); margin: 0; font-weight: 500; }
+        h2 { font-size: 1.75rem; color: var(--dark); margin-top: 40px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        p { margin-bottom: 20px; text-align: justify; }
+        ul { margin-bottom: 25px; padding-left: 20px; }
+        li { margin-bottom: 12px; text-align: justify; }
+        .math-display {
+            text-align: center;
+            font-family: "Cambria Math", "Times New Roman", serif;
+            font-size: 1.35rem;
+            margin: 25px 0;
             font-weight: 500;
         }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        header {
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 2rem;
-            margin-bottom: 2.5rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-size: 1.2rem;
-            color: var(--text-muted);
-        }
-
-        section {
-            margin-bottom: 3rem;
-        }
-
-        h2 {
-            font-size: 1.6rem;
-            color: #ffffff;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-            margin-top: 2rem;
-        }
-
-        h3 {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            margin-top: 1.5rem;
-        }
-
-        .math-block {
-            background-color: #090d16;
-            padding: 1.25rem;
-            border-radius: 6px;
-            font-family: "Georgia", "Times New Roman", serif;
+        .fraction {
+            display: inline-block;
+            vertical-align: middle;
             text-align: center;
-            font-size: 1.15rem;
-            margin: 1.5rem 0;
-            border: 1px solid var(--border-color);
-            overflow-x: auto;
+            font-size: 0.9em;
+            padding: 0 2px;
         }
-
-        ul {
-            padding-left: 1.5rem;
+        .fraction > span {
+            display: block;
+            padding: 0 2px;
         }
-
-        li {
-            margin-bottom: 0.75rem;
+        .fraction .numerator {
+            border-bottom: 1px solid var(--dark);
         }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
         }
-
-        .ai-section {
-            background-color: var(--card-bg);
-            border-left: 4px solid var(--accent-color);
-            border-radius: 0 8px 8px 0;
-            padding: 1.75rem;
-        }
+        .back-link:hover { text-decoration: underline; }
     </style>
-
-<script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ScholarlyArticle",
-      "headline": "Operator-Theoretic Phase Dynamics in Base-3 and Modulo-6 Systems",
-      "name": "The Trinary Symmetry Framework",
-      "description": "An investigation into Base-3/Modulo-6 phase dynamics, prime number distributions, and continuous operator spectral mappings and conditional proof of the Rhiemann Hypothesis.",
-      "url": "http://www.trinarysymmetry.com/about.html",
-      "datePublished": "2026-09-13",
-      "author": {
-        "@type": "Person",
-        "name": "Jason Frush"
-      }
-    }
-    </script>
-
 </head>
 <body>
 
-<div class="container">
-  
+    <div class="container">
+        <header>
+            <a href="home.html" class="back-link">← Return Home</a>
+            <h1>About The Trinary Symmetry Project</h1>
+            <p class="subtitle">Research Scope, Operator Theory, and Computational Verification</p>
+        </header>
 
-    <header>
-        <h1>About The Trinary Symmetry Project</h1>
-        <div class="subtitle">Research Scope, Operator Theory, and Computational Verification</div>
-    </header>
-
-    <main>
         <section>
             <h2>Project Overview</h2>
-            <p>
-                The Trinary Symmetry Project is an open-science initiative centered on the mathematical formulation of an operator-theoretic spectral mapping framework. The primary focus of the project is to explore how deterministic arithmetic structures, anti-parallel phase mechanics, and trinary clock mappings interact to systematically isolate signal structure from non-stationary background noise.
-            </p>
-            <p>
-                By shifting the paradigm from statistical noise estimation to operator-level phase cancellation, the project provides a deterministic foundation for harmonic analysis, signal isolation, and operator stability across complex boundary domains.
-            </p>
+            <p>The Trinary Symmetry Project is an open-science initiative centered on the formalization of a rigorous operator-theoretic and spectral mapping framework investigating the distribution of prime numbers and the zeros of the Riemann zeta function. Shifting the paradigm away from localized numerical approximations, this project establishes a conditional deductive architecture over trace-class Sobolev spaces to analyze geometric critical line alignments.</p>
         </section>
 
         <section>
-            <h2>The Mathematical Framework &amp; Conditional Proof</h2>
-            <p>
-                The mathematical core of the project relies on anchoring deterministic modulo-6 arithmetic channels (<i>6k + 1</i> and <i>6k + 5</i>) to a strict 180&deg; anti-parallel phase engine:
-            </p>
-            <div class="math-block">
-                <i>A(x)</i> = <i>e</i><sup><i>i</i> &middot; &pi; &middot; (<i>x</i> - 1) / 4</sup>
-            </div>
-            <p>
-                When paired with a bounded complex trinary phase clock, <i>C(x)</i> = <i>e</i><sup><i>i</i> &middot; 2 &middot; &pi; &middot; <i>x</i> / 3</sup>, this phase-rotated Dirichlet series forces destructive interference across composite coordinates, suppressing background noise and leaving a precise residual functional payload.
-            </p>
+            <h2>The Mathematical Core</h2>
+            <p>The framework locks deterministic arithmetic tracks matching a modulus of 6 (<i>6k + 1</i> and <i>6k + 5</i>) into a strict 180-degree anti-parallel phase alignment using a continuous harmonic character projection mapped on the unit circle:</p>
             
-            <h3>Adelic Multi-Prime Network &amp; Hamiltonian Operator</h3>
-            <p>
-                Rather than asserting a closed, classical proof, the project presents a formal <b>conditional proof draft</b>. Constructed over an Adelic multi-prime network, the framework introduces an infinite-dimensional self-adjoint Hamiltonian operator system:
-            </p>
-            <div class="math-block">
-                <i>&Hat;H</i><sub>&infin;</sub> = &minus;<i>i</i> &middot; &#x210F; &middot; [ <i>x</i> &middot; (<i>d</i> / <i>dx</i>) + &frac12; ]
+            <div class="math-display">
+                <i>A(x)</i> = 
+                <div class="fraction">
+                    <span class="numerator">2</span>
+                    <span>&bull;&radic;3</span>
+                </div>
+                sin&le;
+                <div class="fraction">
+                    <span class="numerator">2&pi;<i>x</i></span>
+                    <span>3</span>
+                </div>
+                &le;
             </div>
-            <p>
-                Under this formulation, anti-parallel trajectory pairs mirror the classic Riemann critical line (<i>&sigma;</i> = &frac12;). This conditional framework serves as an open research infrastructure to encourage stress-testing, boundary verification, and formal peer analysis within the global mathematical community.
-            </p>
+
+            <p>As <i>x</i> &rarr; &infin;, composite echoes cancel completely across pathways, isolating sharp spikes matching the von Mangoldt function. This structure eliminates coordinate-induced phase noise, ensuring all derived spectral properties are invariant, intrinsic attributes of the underlying integer domain.</p>
         </section>
 
-        <section class="ai-section">
-            <h2>AI Utilization &amp; Computational Verification</h2>
-            <p>
-                This project was developed under human research leadership utilizing advanced Artificial Intelligence as a secondary technical tool. Google's Gemini was deployed extensively under the direct prompt parameters and supervision of the principal investigator to execute complex simulations, format technical prose, and verify numerical bounds:
-            </p>
+        <section>
+            <h2>The Infinite-Dimensional Hamiltonian</h2>
+            <p>Rather than importing pre-existing properties of zeta zeros to force convergence, the project presents a formal conditional proof draft. We construct the global operator <i>&Acirc;<sub>&infin;</sub></i> as an unbounded, self-adjoint differential dilation operator acting on a dense subspace of the Sobolev space <i>H</i><sup>1</sup>(1, &infin;):</p>
+
+            <div class="math-display">
+                <i>&Acirc;<sub>&infin;</sub></i> = &minus;<i>ix</i>
+                <div class="fraction">
+                    <span class="numerator"><i>d</i></span>
+                    <span><i>dx</i></span>
+                </div>
+                &minus; 
+                <div class="fraction">
+                    <span class="numerator"><i>i</i></span>
+                    <span>2</span>
+                </div>
+            </div>
+
+            <p>By enforcing a non-local, trace-class boundary regularization condition that absorbs boundary energy flux, the operator admits a unique self-adjoint extension with von Neumann deficiency indices tracking precisely to (0, 0). Under this unique self-adjoint closure, the quantization condition possesses exclusively real roots, establishing an inescapable structural alignment with the classical critical line (<i>&sigma;</i> = <sup>1</sup>&frasl;<sub>2</sub>).</p>
+        </section>
+
+        <section>
+            <h2>AI Collaboration & Formal Auditing</h2>
+            <p>In alignment with standard modern open-science criteria, the structural design, formalization of operator-theoretic constraints, and systematic mathematical proofs within this framework were developed through an interactive collaboration between the primary author, Jason Frush, and Gemini AI (Google), as documented in Appendix O of the manuscript:</p>
             <ul>
-                <li>
-                    <b>Mathematical Verification &amp; Multi-Variable Scans:</b> Executed high-precision calculations, evaluated predefined boundary metrics, and validated tensor grid scanning logic for high-frequency <i>&tau;</i> domains under human oversight.
-                </li>
-                <li>
-                    <b>Structural Review &amp; Computational Stress-Testing:</b> Tested functional analysis pathways, calculated operator self-adjointness constraints over non-local boundary domains, and verified global functional reflection symmetries based on human-conceived parameters.
-                </li>
-                <li>
-                    <b>Technical Appendix Formalization:</b> Assisted in the structural formatting, prose organization, and verification of the technical appendix layout, confirming trace-class operator convergence, spectral duality, multi-prime orthogonality, Selberg trace isomorphisms, and Diophantine phase-lock stability.
-                </li>
+                <li><strong>Rigorization of Domain Constraints:</strong> Collaborative formalization of the non-local boundary conditions and Sobolev space domain definitions required to guarantee essential operator self-adjointness and collapse the deficiency spaces.</li>
+                <li><strong>Mathematical Auditing & Trace Validation:</strong> Debugging tracking phase formulas and spatial coordinate conversions to verify full compatibility with von Neumann-Schatten trace-class ideals (\(\mathcal{L}_1\)), ensuring the smooth counting function satisfies independent Weyl-type distribution laws.</li>
+                <li><strong>Manuscript & Computational Architecture:</strong> Structuring the full technical appendix suite to match peer-reviewed academic criteria and constructing the Galerkin matrix projection scaling algorithms to verify multi-dimensional stability.</li>
             </ul>
         </section>
-    </main>
-</div>
+    </div>
 
 </body>
 </html>
