@@ -95,7 +95,7 @@
 
     <header>
         <h1>Dual Anti-Parallel Wave Visualizer</h1>
-        <p>Interactive tracking of the two phase-locked harmonic oscillators governing the Modulo-6 cancellation engine[span_0](start_span)[span_0](end_span).</p>
+        <p>Interactive tracking of the two phase-locked harmonic oscillators governing the Modulo-6 cancellation engine.</p>
     </header>
 
     <div class="card">
@@ -127,37 +127,36 @@
             }
             return true;
         }
+function generateData(min, max) {
+    const wave1Data = [];
+    const wave2Data = [];
+    const primeSpikesData = [];
 
-        function generateData(min, max) {
-            const labels = [];
-            const primeSpikesData = [];
-            const wave1Data = [];
-            const wave2Data = [];
+    const step = 0.1;
+    for (let x = min; x <= max; x += step) {
+        let roundedX = Math.round(x * 10) / 10;
+        let logX = Math.log(roundedX);
+       
+        // Regularized kernel amplitude scaling centered around zero
+        let envelope = 2.0 / (1.0 + 0.1 * roundedX);
+     
+        let w1 = Math.cos((2 * Math.PI * logX) / (3 * Math.log(3))) * envelope;
+        let w2 = Math.sin((Math.PI * logX) / (4 * Math.log(6))) * envelope;
 
-            const step = 0.2;
-            for (let x = min; x <= max; x += step) {
-                let roundedX = Math.round(x * 10) / 10;
-                labels.push(roundedX);
+        wave1Data.push({ x: roundedX, y: w1 });
+        wave2Data.push({ x: roundedX, y: w2 });
 
-                let envelope = 1.2 / (1 + 0.03 * Math.abs(x));
-               
-                let w1 = Math.sin((Math.PI * x) / 3) * envelope;
-                let w2 = Math.sin((Math.PI * x / 3) + Math.PI) * envelope;
-
-                wave1Data.push(w1);
-                wave2Data.push(w2);
-            }
-
-            const alignedSpikes = labels.map(lbl => {
-                if (Math.abs(lbl - Math.round(lbl)) < 0.01) {
-                    let iv = Math.round(lbl);
-                    return (iv >= min && iv <= max && isPrime(iv)) ? Math.log(iv) : 0;
-                }
-                return 0;
-            });
-
-            return { labels, alignedSpikes, wave1Data, wave2Data };
+        let iv = Math.round(roundedX);
+        if (Math.abs(roundedX - iv) < 0.01 && iv >= min && iv <= max && isPrime(iv)) {
+            primeSpikesData.push({ x: iv, y: Math.log(iv) });
         }
+    }
+
+    return { wave1Data, wave2Data, primeSpikesData };
+}
+
+
+
 
         const ctx = document.getElementById('phaseChart').getContext('2d');
         const initialData = generateData(2, 50);
@@ -165,15 +164,16 @@
         const phaseChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: initialData.labels,
                 datasets: [
                     {
-                        type: 'bar',
+                        type: 'line',
                         label: 'Prime Support Spikes (\u039b(n))',
-                        data: initialData.alignedSpikes,
-                        backgroundColor: 'rgba(3, 102, 214, 0.75)',
+                        data: initialData.primeSpikesData,
+                        backgroundColor: 'rgba(3, 102, 214, 1)',
                         borderColor: 'rgba(3, 102, 214, 1)',
-                        borderWidth: 1,
+                        pointRadius: 5,
+                        pointStyle: 'rectRot',
+                        showLine: false,
                         order: 3
                     },
                     {
@@ -207,13 +207,18 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: {
+                        type: 'linear',
+                        position: 'bottom',
                         title: { display: true, text: 'Continuous Continuum Index (x)' },
                         ticks: { maxTicksLimit: 15 }
                     },
                     y: {
-                        title: { display: true, text: 'Oscillator Amplitude' },
-                        suggestedMin: -2.5,
-                        suggestedMax: 3.5
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: { display: true, text: 'Prime Support Height (\u039b(n))' },
+                        suggestedMin: 0,
+                        suggestedMax: 5.0
                     }
                 }
             }
@@ -237,8 +242,7 @@
             maxValSpan.textContent = max;
 
             const newData = generateData(min, max);
-            phaseChart.data.labels = newData.labels;
-            phaseChart.data.datasets[0].data = newData.alignedSpikes;
+            phaseChart.data.datasets[0].data = newData.primeSpikesData;
             phaseChart.data.datasets[1].data = newData.wave1Data;
             phaseChart.data.datasets[2].data = newData.wave2Data;
             phaseChart.update();
