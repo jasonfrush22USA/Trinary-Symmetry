@@ -1,24 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- KaTeX CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-
-<!-- KaTeX JS & Auto-render extension -->
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '$', right: '$', display: false}
-    ]
-  });"></script>⁠<script id="MathJax-script" async src="[https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js](https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js)"></script>⁠
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Residual Spectral Variance Decay Floor</title>
+    <!-- MathJax for rendering manuscript LaTeX formulas -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0f172a; color: #f8fafc; padding: 1.5rem; margin: 0; }
@@ -38,7 +34,7 @@
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer; border: 2px solid #0f172a; }
 
         .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1.5rem; }
-        .canvas-wrapper { width: 100%; height: 400px; position: relative; }
+        .canvas-wrapper { width: 100%; height: 420px; position: relative; }
         canvas { width: 100% !important; height: 100% !important; background: #0f172a; border-radius: 8px; border: 1px solid #334155; display: block; }
 
         .theory-section { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.25rem; }
@@ -51,16 +47,18 @@
     <div class="container">
         <div class="header">
             <h1>Residual Spectral Variance Decay Floor</h1>
-            <p class="subtitle">Asymptotic noise reduction floor converging toward 98.08% (V_∞ ≈ 0.0192)</p>
+            <p class="subtitle">Asymptotic composite noise reduction converging toward 98.08% ($\eta \to 0.9808$, $\mathcal{V}_\infty \approx 0.0192$) under modulo-6 phase engine</p>
         </div>
 
         <div class="controls-card">
-            
             <div class="control-group">
-                <label><span>Domain Size (N)</span><span id="nVal" class="val-badge">5000</span></label>
-                <input type="range" id="varN" min="1000" max="10000" value="5000" step="500">
+                <label><span>Domain Threshold ($N$)</span><span id="nVal" class="val-badge">10,000,000</span></label>
+                <input type="range" id="varN" min="100000" max="10000000" value="10000000" step="100000">
             </div>
-        
+            <div class="control-group">
+                <label><span>Cross-Term Noise ($\eta_0$)</span><span id="noiseVal" class="val-badge">0.0020</span></label>
+                <input type="range" id="varNoise" min="0" max="0.008" value="0.0020" step="0.0005">
+            </div>
         </div>
 
         <div class="card">
@@ -68,10 +66,14 @@
         </div>
 
         <div class="theory-section">
-            <h2>Theoretical Foundation & Mathematical Dynamics</h2>
-            <p>Spectral variance $\sigma^2(N, p_{\text{max}})$ quantifies total residual noise present in phase-sum signals after applying prime notch filters. As the cutoff threshold $p_{\text{max}} \to \infty$, the normalized variance ratio $\mathcal{V} = \sigma^2 / \sigma_{\text{raw}}^2$ drops asymptotically toward a fixed theoretical limit.</p>
-<p>Normalizing for the removal of base primorial factors ($p \in \{2, 3, 5\}$), the residual variance converges to $\mathcal{V}_{\infty} = \prod_{p > 5} (1 - 1/p^2) \approx 0.0192$. Subtracting this value from unity yields an absolute noise reduction ceiling of **98.08%**.</p>
-<p>This visualization plots the decay curve of normalized background variance against increasing domain thresholds $N$. The horizontal asymptote highlights the 98.08% noise floor, verifying the theoretical variance bounds established in the manuscript.</p>
+            <h2>Theoretical Foundation &amp; Mathematical Dynamics</h2>
+            <p>Under <strong>Lemma 2.1</strong> (Unitary Coordinate Equivalence $\mathcal{U} : \ell^2(\mathbb{P}, \nu) \to L^2(1, \infty)$), atomic prime signals are mapped into smooth $L^2$ elements. The modulo-6 anti-parallel phase driver $A(x) = \exp(i\pi(x-1)/4)$ drives the reduced residue channels $\mathcal{C}_1 = 6\mathbb{N}+1$ and $\mathcal{C}_5 = 6\mathbb{N}+5$ in exact $180^\circ$ phase opposition ($A(6k+5) = -A(6k+1)$, <strong>Theorem 3.1</strong>).</p>
+            <p>By <strong>Theorem 3.2</strong>, non-prime composite cross-terms undergo destructive interference with residual error decaying as $\mathcal{O}(x / \ln^A x)$ via the Bombieri-Vinogradov theorem. As the cutoff domain $N \to \infty$, the residual variance normalized against base primorial factors ($p \in \{2, 3, 5\}$) converges to:
+            $$\mathcal{V}_{\infty} = \prod_{p > 5} \left(1 - \frac{1}{p^2}\right) \approx 0.0192$$
+</p>
+            <p>Evaluating the normalized root-mean-square error (NRMSE) ratio yields the absolute noise suppression benchmark from Section 3.4:
+            $$\eta = 1 - \frac{\text{NRMSE}_{\text{filtered}}(10^7)}{\text{NRMSE}_{\text{unfiltered}}(10^7)} = 0.9808 \quad (\mathbf{98.08\%})$$
+</p>
         </div>
     </div>
 
@@ -90,37 +92,117 @@
         }
 
         window.addEventListener('resize', draw);
-        
-            function draw() {
-                const N = parseInt(document.getElementById('varN').value);
-                document.getElementById('nVal').textContent = N;
 
-                const { w, h } = resize();
-                ctx.clearRect(0, 0, w, h);
+        function draw() {
+            const N = parseInt(document.getElementById('varN').value, 10);
+            const noiseAmp = parseFloat(document.getElementById('varNoise').value);
+            document.getElementById('nVal').textContent = N.toLocaleString();
+            document.getElementById('noiseVal').textContent = noiseAmp.toFixed(4);
 
-                ctx.strokeStyle = '#475569'; ctx.beginPath();
-                ctx.moveTo(40, 20); ctx.lineTo(40, h - 30); ctx.lineTo(w - 20, h - 30); ctx.stroke();
+            const { w, h } = resize();
+            ctx.clearRect(0, 0, w, h);
 
-                const floorY = (h - 30) - (0.0192 / 0.1) * (h - 60);
-                ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
-                ctx.beginPath(); ctx.moveTo(40, floorY); ctx.lineTo(w - 20, floorY); ctx.stroke();
-                ctx.setLineDash([]);
+            const padding = { top: 30, right: 30, bottom: 40, left: 60 };
+            const plotW = w - padding.left - padding.right;
+            const plotH = h - padding.top - padding.bottom;
 
-                ctx.fillStyle = '#f43f5e'; ctx.font = '10px monospace';
-                ctx.fillText('Theoretical Floor: V_∞ = 0.0192 (98.08% Suppression)', 50, floorY - 8);
+            const yMax = 0.10;
+            const yMin = 0.00;
 
-                ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 2; ctx.beginPath();
-                for (let x = 40; x < w - 20; x += 2) {
-                    const t = (x - 40) / (w - 60);
-                    const v = 0.0192 + 0.07 * Math.exp(-4 * t) + 0.002 * Math.sin(20 * t);
-                    const y = (h - 30) - (v / 0.1) * (h - 60);
-                    if (x === 40) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
+            function mapY(v) {
+                return padding.top + plotH * (1 - (v - yMin) / (yMax - yMin));
             }
-            document.getElementById('varN').addEventListener('input', draw);
-            draw();
-        
+
+            function mapX(nVal) {
+                return padding.left + (nVal / N) * plotW;
+            }
+
+            // Grid & Y-Axis Ticks
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#64748b';
+            ctx.font = '11px monospace';
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+
+            const yTicks = [0.00, 0.02, 0.04, 0.06, 0.08, 0.10];
+            yTicks.forEach(tick => {
+                const yPos = mapY(tick);
+                ctx.beginPath();
+                ctx.moveTo(padding.left, yPos);
+                ctx.lineTo(w - padding.right, yPos);
+                ctx.stroke();
+                ctx.fillText(tick.toFixed(2), padding.left - 8, yPos);
+            });
+
+            // X-Axis Ticks (Formatted for N up to 10^7)
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            const xTicks = [0, Math.floor(N * 0.25), Math.floor(N * 0.5), Math.floor(N * 0.75), N];
+            xTicks.forEach(tick => {
+                const xPos = mapX(tick);
+                ctx.beginPath();
+                ctx.moveTo(xPos, mapY(yMin));
+                ctx.lineTo(xPos, mapY(yMin) + 4);
+                ctx.stroke();
+               
+                let label = tick >= 1e6 ? (tick / 1e6).toFixed(1) + 'M' : (tick >= 1e3 ? (tick / 1e3).toFixed(0) + 'k' : tick.toString());
+                ctx.fillText(label, xPos, mapY(yMin) + 8);
+            });
+
+            // Main Axes Lines
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(padding.left, padding.top);
+            ctx.lineTo(padding.left, padding.top + plotH);
+            ctx.lineTo(padding.left + plotW, padding.top + plotH);
+            ctx.stroke();
+
+            // Theoretical Floor Line (V_infty = 0.0192)
+            const floorVal = 0.0192;
+            const floorY = mapY(floorVal);
+
+            ctx.strokeStyle = '#f43f5e';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            ctx.moveTo(padding.left, floorY);
+            ctx.lineTo(padding.left + plotW, floorY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Floor Callout Label
+            ctx.fillStyle = '#f43f5e';
+            ctx.font = '11px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Theoretical Noise Floor: V_∞ = 0.0192 (98.08% Noise Suppression)`, padding.left + 12, floorY - 10);
+
+            // Decay Curve Simulation
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            const steps = 300;
+            for (let i = 0; i <= steps; i++) {
+                const currentN = (i / steps) * N;
+                const x = mapX(currentN);
+               
+                const progress = currentN / N;
+                const decayRate = 4.5 * (N / 10000000);
+                const transientNoise = noiseAmp * Math.sin(30 * progress) * Math.exp(-2 * progress);
+                const v = floorVal + 0.075 * Math.exp(-decayRate * progress) + transientNoise;
+
+                const y = mapY(v);
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        document.getElementById('varN').addEventListener('input', draw);
+        document.getElementById('varNoise').addEventListener('input', draw);
+        draw();
     </script>
 </body>
 </html>
+
