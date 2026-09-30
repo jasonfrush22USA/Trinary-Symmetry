@@ -1,2 +1,2 @@
-# Trinary-Harmonic-Sieve
-The Trinary Harmonic Sieve: Fourier Phase Cancellation and Residual Variance Bounds
+# Trinary-Symmetry Model
+The Trinary Symmetry Model and  Eisenstein-Lattice Type-II Analysis
